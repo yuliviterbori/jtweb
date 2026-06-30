@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El problema de los vasos — Laboratorio 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #F7F6F2;
+  --surface: #ffffff;
+  --border: #E4E2D8;
+  --text: #1C1B18;
+  --text-2: #6B6960;
+  --text-3: #9E9C94;
+  --purple: #534AB7;
+  --purple-light: #EEEDFE;
+  --teal: #0F6E56;
+  --teal-light: #E1F5EE;
+  --amber: #BA7517;
+  --amber-light: #FAEEDA;
+  --red: #A32D2D;
+  --red-light: #FCEBEB;
+  --radius: 10px;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+.page {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+header {
+  margin-bottom: 2.5rem;
+}
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--purple);
+  margin-bottom: 10px;
+}
+
+h1 {
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.intro {
+  font-size: 15px;
+  color: var(--text-2);
+  line-height: 1.7;
+  border-left: 3px solid var(--border);
+  padding-left: 14px;
+}
+
+.intro b { color: var(--text); font-weight: 600; }
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-2);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.tab:hover { border-color: var(--purple); color: var(--purple); }
+.tab.active { background: var(--purple); border-color: var(--purple); color: #fff; }
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+.verdict {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.verdict.yes { background: var(--teal-light); color: var(--teal); border: 1px solid #9FE1CB; }
+.verdict.no  { background: var(--red-light);  color: var(--red);  border: 1px solid #F7C1C1; }
+
+.verdict-icon {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+}
+.verdict.yes .verdict-icon { background: var(--teal); color: #fff; }
+.verdict.no  .verdict-icon { background: var(--red);  color: #fff; }
+
+.stage {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 32px;
+  min-height: 200px;
+}
+
+.glass-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.glass-label {
+  font-size: 11px;
+  color: var(--text-3);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.glass-ml {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  min-height: 20px;
+}
+
+.glass-outer {
+  border: 2px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  position: relative;
+  overflow: hidden;
+  background: #F7F6F2;
+}
+
+.glass-water {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  transition: height 0.35s cubic-bezier(0.4,0,0.2,1);
+  border-radius: 0 0 6px 6px;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.btn-action {
+  padding: 9px 14px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s;
+  text-align: left;
+}
+
+.btn-action:hover { background: var(--purple-light); border-color: var(--purple); color: var(--purple); }
+
+.btn-reset {
+  grid-column: 1 / -1;
+  padding: 9px 14px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text-2);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.12s;
+}
+
+.btn-reset:hover { background: var(--surface); color: var(--text); }
+
+.log {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  max-height: 160px;
+  overflow-y: auto;
+  margin-bottom: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.9;
+}
+
+.log-entry { border-bottom: 1px solid var(--bg); padding: 2px 0; }
+.log-entry:last-child { border-bottom: none; }
+.log-entry.win { color: var(--teal); font-weight: 600; }
+
+.math-box {
+  background: var(--amber-light);
+  border: 1px solid #FAC775;
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  font-size: 13.5px;
+  color: #633806;
+  line-height: 1.8;
+}
+
+.math-box b { color: #412402; }
+.math-box .formula {
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(255,255,255,0.5);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 10px 0 4px;
+  font-size: 13px;
+  display: block;
+}
+
+.hint-box {
+  background: var(--purple-light);
+  border: 1px solid #AFA9EC;
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  font-size: 13.5px;
+  color: #3C3489;
+  line-height: 1.8;
+  display: none;
+  margin-bottom: 10px;
+}
+
+.hint-box b { color: #26215C; }
+
+.reveal-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btn-reveal {
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-3);
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s;
+  letter-spacing: 0.02em;
+}
+
+.btn-reveal:hover { border-color: var(--purple); color: var(--purple); background: var(--purple-light); }
+.btn-reveal.active { border-color: var(--purple); color: var(--purple); background: var(--purple-light); }
+
+.separator {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+footer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+  transition: color 0.12s;
+}
+.back-link:hover { color: var(--purple); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <a href="index.html" class="back-link">← Volver al inicio</a>
+
+  <header>
+    <div class="eyebrow">Laboratorio 2 · Teorema de Bézout</div>
+    <h1>El problema de los vasos</h1>
+    <p class="intro">
+      Tenés un tanque enorme de agua, un vaso de <b>99 ml</b> y otro de <b>105 ml</b>.
+      Podés llenarlos desde el tanque y verter su contenido en una botella sin marcas.
+      ¿Podés obtener exactamente la cantidad deseada?
+    </p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('a')">a. ¿Exactamente 1000 ml?</button>
+    <button class="tab" onclick="switchTab('b')">b. ¿Exactamente 1500 ml?</button>
+  </div>
+
+  <div id="panel-a" class="panel active">
+
+    <div class="stage">
+      <div class="glass-wrap">
+        <div class="glass-ml" id="a-ml99">0 ml</div>
+        <div class="glass-outer" style="width:56px; height:88px;">
+          <div class="glass-water" id="a-w99" style="height:0%; background:#7F77DD;"></div>
+        </div>
+        <div class="glass-label">Vaso<br>99 ml</div>
+      </div>
+      <div class="glass-wrap">
+        <div class="glass-ml" id="a-ml105">0 ml</div>
+        <div class="glass-outer" style="width:60px; height:96px;">
+          <div class="glass-water" id="a-w105" style="height:0%; background:#7F77DD;"></div>
+        </div>
+        <div class="glass-label">Vaso<br>105 ml</div>
+      </div>
+      <div class="glass-wrap">
+        <div class="glass-ml" id="a-mlbot" style="font-size:15px; font-weight:600;">0 ml</div>
+        <div class="glass-outer" style="width:74px; height:130px; border-color:#534AB7;">
+          <div class="glass-water" id="a-wbot" style="height:0%; background:#1D9E75;"></div>
+        </div>
+        <div class="glass-label">Botella<br>(sin límite)</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn-action" onclick="act('a','fill99')">↑ Llenar vaso 99</button>
+      <button class="btn-action" onclick="act('a','fill105')">↑ Llenar vaso 105</button>
+      <button class="btn-action" onclick="act('a','pour99')">→ Verter 99 → botella</button>
+      <button class="btn-action" onclick="act('a','pour105')">→ Verter 105 → botella</button>
+      <button class="btn-action" onclick="act('a','back99')">← Sacar 99 de botella</button>
+      <button class="btn-action" onclick="act('a','back105')">← Sacar 105 de botella</button>
+      <button class="btn-reset" onclick="reset('a')">↺ Reiniciar</button>
+    </div>
+
+    <div class="log" id="a-log">
+      <div class="log-entry">Listo. Intentá llegar a 1000 ml en la botella...</div>
+    </div>
+
+    <div class="reveal-row">
+      <button class="btn-reveal" id="a-hint-btn" onclick="toggle('a','hint')">💡 Una pista</button>
+      <button class="btn-reveal" id="a-ans-btn" onclick="toggle('a','ans')">🔍 Mostrar respuesta</button>
+    </div>
+
+    <div class="hint-box" id="a-hint">
+      <b>Pista:</b> Cualquier cantidad que puedas obtener combinando estos dos vasos se puede escribir como
+      <b>99 · s + 105 · t</b> para algún par de enteros s y t. Pensá: ¿qué tienen en común el 99 y el 105?
+      ¿Hay algún número que divida a ambos? Y si ese número divide a 99 y a 105... ¿también divide a 1000?
+    </div>
+
+    <div class="math-box" id="a-ans" style="display:none;">
+      <b>Respuesta: No es posible.</b><br>
+      Cualquier cantidad obtenible con estos vasos es de la forma:
+      <span class="formula">99 · s + 105 · t = k &nbsp;&nbsp; (con s, t ∈ ℤ)</span>
+      El mcd(99, 105) = 3, y 3 divide a toda combinación lineal de 99 y 105.
+      Como <b>1000 no es múltiplo de 3</b> (1000 = 3 × 333 + 1), es imposible obtenerlo.
+    </div>
+
+  </div>
+
+  <div id="panel-b" class="panel">
+
+    <div class="stage">
+      <div class="glass-wrap">
+        <div class="glass-ml" id="b-ml99">0 ml</div>
+        <div class="glass-outer" style="width:56px; height:88px;">
+          <div class="glass-water" id="b-w99" style="height:0%; background:#7F77DD;"></div>
+        </div>
+        <div class="glass-label">Vaso<br>99 ml</div>
+      </div>
+      <div class="glass-wrap">
+        <div class="glass-ml" id="b-ml105">0 ml</div>
+        <div class="glass-outer" style="width:60px; height:96px;">
+          <div class="glass-water" id="b-w105" style="height:0%; background:#7F77DD;"></div>
+        </div>
+        <div class="glass-label">Vaso<br>105 ml</div>
+      </div>
+      <div class="glass-wrap">
+        <div class="glass-ml" id="b-mlbot" style="font-size:15px; font-weight:600;">0 ml</div>
+        <div class="glass-outer" style="width:74px; height:130px; border-color:#534AB7;">
+          <div class="glass-water" id="b-wbot" style="height:0%; background:#1D9E75;"></div>
+        </div>
+        <div class="glass-label">Botella<br>(sin límite)</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn-action" onclick="act('b','fill99')">↑ Llenar vaso 99</button>
+      <button class="btn-action" onclick="act('b','fill105')">↑ Llenar vaso 105</button>
+      <button class="btn-action" onclick="act('b','pour99')">→ Verter 99 → botella</button>
+      <button class="btn-action" onclick="act('b','pour105')">→ Verter 105 → botella</button>
+      <button class="btn-action" onclick="act('b','back99')">← Sacar 99 de botella</button>
+      <button class="btn-action" onclick="act('b','back105')">← Sacar 105 de botella</button>
+      <button class="btn-reset" onclick="reset('b')">↺ Reiniciar</button>
+    </div>
+
+    <div class="log" id="b-log">
+      <div class="log-entry">Listo. Intentá llegar a 1500 ml en la botella...</div>
+    </div>
+
+    <div class="reveal-row">
+      <button class="btn-reveal" id="b-hint-btn" onclick="toggle('b','hint')">💡 Una pista</button>
+      <button class="btn-reveal" id="b-ans-btn" onclick="toggle('b','ans')">🔍 Mostrar respuesta</button>
+    </div>
+
+    <div class="hint-box" id="b-hint">
+      <b>Pista:</b> Al igual que en el ítem anterior, pensá en qué números puede expresarse una combinación
+      de 99 y 105. ¿Es 1500 divisible por el mcd(99, 105)? Eso cambia todo...
+    </div>
+
+    <div class="math-box" id="b-ans" style="display:none;">
+      <b>Respuesta: Sí es posible.</b><br>
+      mcd(99, 105) = 3, y <b>1500 es múltiplo de 3</b> (1500 = 3 × 500), así que la solución existe.<br><br>
+      <b>¿Cómo hacerlo concretamente?</b><br>
+      Observá que: <span class="formula">105 − 99 = 6</span>
+      Si llenamos el vaso de 105 ml y le sacamos 99 ml a la botella, obtenemos <b>6 ml netos</b> por cada vuelta.
+      Repitiendo esto <b>250 veces</b> obtenemos:
+      <span class="formula">250 × (105 − 99) = 250 × 6 = 1500 ml ✓</span>
+      Es decir: llenamos el vaso de 105 ml <b>250 veces</b> (aportamos 26250 ml) y sacamos el vaso de 99 ml <b>250 veces</b> (retiramos 24750 ml):<br>
+      <span class="formula">26250 − 24750 = 1500 ml ✓</span>
+      En notación de Bézout: <b>105 · 250 + 99 · (−250) = 1500</b>, con s = 250 y t = −250.
+    </div>
+
+  </div>
+
+  <footer>
+    Laboratorio 2 · Jóvenes Talentos · Módulo de Teoría de Números
+  </footer>
+
+</div>
+
+<script>
+const state = {
+  a: { v99: 0, v105: 0, bot: 0 },
+  b: { v99: 0, v105: 0, bot: 0 }
+};
+
+function updateUI(p) {
+  const s = state[p];
+  const target = p === 'a' ? 1000 : 1500;
+  document.getElementById(p+'-ml99').textContent = s.v99 + ' ml';
+  document.getElementById(p+'-ml105').textContent = s.v105 + ' ml';
+  document.getElementById(p+'-mlbot').textContent = s.bot + ' ml';
+  document.getElementById(p+'-w99').style.height = (s.v99 / 99 * 100) + '%';
+  document.getElementById(p+'-w105').style.height = (s.v105 / 105 * 100) + '%';
+  const maxBot = 2000;
+  document.getElementById(p+'-wbot').style.height = Math.min(s.bot / maxBot * 100, 100) + '%';
+  const wbot = document.getElementById(p+'-wbot');
+  wbot.style.background = s.bot === target ? '#EF9F27' : '#1D9E75';
+}
+
+function log(p, msg, win) {
+  const el = document.getElementById(p + '-log');
+  const div = document.createElement('div');
+  div.className = 'log-entry' + (win ? ' win' : '');
+  div.textContent = msg;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+function act(p, action) {
+  const s = state[p];
+  const target = p === 'a' ? 1000 : 1500;
+  let msg = '';
+  if (action === 'fill99')   { s.v99 = 99;  msg = 'Llenaste el vaso de 99 ml.'; }
+  if (action === 'fill105')  { s.v105 = 105; msg = 'Llenaste el vaso de 105 ml.'; }
+  if (action === 'pour99')   {
+    if (s.v99 === 0) { msg = 'El vaso de 99 ml está vacío.'; }
+    else { s.bot += s.v99; msg = 'Vertiste '+s.v99+' ml → botella: '+s.bot+' ml.'; s.v99 = 0; }
+  }
+  if (action === 'pour105')  {
+    if (s.v105 === 0) { msg = 'El vaso de 105 ml está vacío.'; }
+    else { s.bot += s.v105; msg = 'Vertiste '+s.v105+' ml → botella: '+s.bot+' ml.'; s.v105 = 0; }
+  }
+  if (action === 'back99')  {
+    if (s.bot < 99) { msg = 'La botella tiene menos de 99 ml, no se puede sacar un vaso completo.'; }
+    else { s.bot -= 99; msg = 'Sacaste 99 ml de la botella → botella: '+s.bot+' ml.'; }
+  }
+  if (action === 'back105') {
+    if (s.bot < 105) { msg = 'La botella tiene menos de 105 ml, no se puede sacar un vaso completo.'; }
+    else { s.bot -= 105; msg = 'Sacaste 105 ml de la botella → botella: '+s.bot+' ml.'; }
+  }
+  updateUI(p);
+  const win = s.bot === target;
+  if (win) msg += ' 🎯 ¡Llegaste exactamente a ' + target + ' ml!';
+  log(p, msg, win);
+}
+
+function reset(p) {
+  state[p] = { v99: 0, v105: 0, bot: 0 };
+  updateUI(p);
+  const target = p === 'a' ? 1000 : 1500;
+  document.getElementById(p+'-log').innerHTML =
+    '<div class="log-entry">Reiniciado. Intentá llegar a '+target+' ml...</div>';
+}
+
+function toggle(p, type) {
+  const boxId = type === 'hint' ? p+'-hint' : p+'-ans';
+  const btnId = type === 'hint' ? p+'-hint-btn' : p+'-ans-btn';
+  const box = document.getElementById(boxId);
+  const btn = document.getElementById(btnId);
+  const visible = box.style.display !== 'none';
+  box.style.display = visible ? 'none' : (type === 'hint' ? 'block' : 'block');
+  btn.classList.toggle('active', !visible);
+}
+
+function switchTab(t) {
+  document.querySelectorAll('.tab').forEach((b, i) =>
+    b.classList.toggle('active', ['a','b'][i] === t));
+  document.querySelectorAll('.panel').forEach(p =>
+    p.classList.remove('active'));
+  document.getElementById('panel-' + t).classList.add('active');
+}
+</script>
+</body>
+</html>

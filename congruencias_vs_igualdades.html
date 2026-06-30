@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Congruencias vs Igualdades — Laboratorio 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #F7F6F2;
+  --surface: #ffffff;
+  --border: #E4E2D8;
+  --text: #1C1B18;
+  --text-2: #6B6960;
+  --text-3: #9E9C94;
+  --purple: #534AB7;
+  --purple-light: #EEEDFE;
+  --purple-mid: #AFA9EC;
+  --teal: #0F6E56;
+  --teal-light: #E1F5EE;
+  --red: #A32D2D;
+  --red-light: #FCEBEB;
+  --amber: #854F0B;
+  --amber-light: #FAEEDA;
+  --radius: 10px;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Inter', sans-serif;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 2rem 1rem 4rem;
+}
+
+.page { max-width: 780px; margin: 0 auto; }
+
+/* HEADER */
+.eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--purple); margin-bottom: 10px;
+}
+h1 { font-size: 28px; font-weight: 600; line-height: 1.25; margin-bottom: 10px; }
+.subtitle { font-size: 15px; color: var(--text-2); line-height: 1.7; margin-bottom: 2rem; }
+
+/* COMPARISON GRID */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 2rem;
+}
+@media (max-width: 560px) { .compare-grid { grid-template-columns: 1fr; } }
+
+.col-header {
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  font-size: 14px; font-weight: 600;
+  text-align: center;
+  border: 1.5px solid;
+}
+.col-eq  { background: var(--teal-light);   color: var(--teal);   border-color: #9FE1CB; }
+.col-cong { background: var(--purple-light); color: var(--purple); border-color: var(--purple-mid); }
+
+.col-eq span, .col-cong span {
+  display: block; font-family: var(--mono);
+  font-size: 17px; font-weight: 600; margin-bottom: 2px;
+}
+.col-eq span { color: var(--teal); }
+.col-cong span { color: var(--purple); }
+
+/* OPERATION ROWS */
+.op-section { margin-bottom: 2rem; }
+.op-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--text-3);
+  margin-bottom: 10px; padding-left: 2px;
+}
+
+.op-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+@media (max-width: 560px) { .op-row { grid-template-columns: 1fr; } }
+
+.op-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.op-card .formula {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 8px;
+  line-height: 1.7;
+}
+
+.op-card .result {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--text-2);
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: var(--bg);
+  font-family: var(--mono);
+}
+
+.badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 50%;
+  font-size: 10px; font-weight: 700; flex-shrink: 0;
+}
+.badge.ok  { background: var(--teal);  color: #fff; }
+.badge.err { background: var(--red);   color: #fff; }
+.badge.warn { background: var(--amber); color: #fff; }
+
+/* DIVIDER */
+.divider {
+  border: none; border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+/* INTERACTIVE SECTION */
+.interactive {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.interactive h2 {
+  font-size: 16px; font-weight: 600; margin-bottom: 6px;
+}
+.interactive .desc {
+  font-size: 13px; color: var(--text-2); margin-bottom: 1.2rem; line-height: 1.6;
+}
+
+.inputs {
+  display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end;
+  margin-bottom: 1.2rem;
+}
+
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field label { font-size: 11px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.05em; }
+.field input, .field select {
+  padding: 8px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg);
+  width: 80px;
+  outline: none;
+  transition: border-color 0.12s;
+}
+.field input:focus, .field select:focus { border-color: var(--purple); }
+.field select { width: 110px; cursor: pointer; }
+
+.op-selector { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.2rem; }
+.op-btn {
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--text-2);
+  font-family: var(--sans);
+  font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.12s;
+}
+.op-btn:hover { border-color: var(--purple); color: var(--purple); }
+.op-btn.active { background: var(--purple); border-color: var(--purple); color: #fff; }
+
+.result-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+@media (max-width: 480px) { .result-grid { grid-template-columns: 1fr; } }
+
+.result-card {
+  border-radius: var(--radius); padding: 14px 16px;
+  border: 1.5px solid;
+}
+.result-card.ok   { background: var(--teal-light);  border-color: #9FE1CB; }
+.result-card.err  { background: var(--red-light);   border-color: #F7C1C1; }
+.result-card.warn { background: var(--amber-light); border-color: #FAC775; }
+
+.result-card .rc-label {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.06em; margin-bottom: 8px;
+}
+.result-card.ok   .rc-label { color: var(--teal); }
+.result-card.err  .rc-label { color: var(--red); }
+.result-card.warn .rc-label { color: var(--amber); }
+
+.result-card .rc-formula {
+  font-family: var(--mono); font-size: 14px; font-weight: 500;
+  color: var(--text); margin-bottom: 6px; line-height: 1.6;
+}
+.result-card .rc-note {
+  font-size: 12px; color: var(--text-2); line-height: 1.5;
+}
+
+/* WARNING BOX */
+.warning-box {
+  background: var(--red-light); border: 1px solid #F7C1C1;
+  border-radius: var(--radius); padding: 14px 18px;
+  font-size: 13.5px; color: var(--red); line-height: 1.8; margin-bottom: 1.5rem;
+}
+.warning-box b { color: #6B1111; }
+
+.tip-box {
+  background: var(--amber-light); border: 1px solid #FAC775;
+  border-radius: var(--radius); padding: 14px 18px;
+  font-size: 13.5px; color: var(--amber); line-height: 1.8;
+}
+.tip-box b { color: #412402; }
+.tip-box .formula { font-family: var(--mono); font-size: 13px;
+  background: rgba(255,255,255,0.5); border-radius: 6px;
+  padding: 7px 12px; margin: 8px 0 4px; display: block; }
+
+footer {
+  text-align: center; font-size: 12px; color: var(--text-3);
+  margin-top: 2.5rem; padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.back-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 500; color: var(--text-2);
+  text-decoration: none; margin-bottom: 1.5rem;
+  transition: color 0.12s;
+}
+.back-link:hover { color: var(--purple); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <a href="index.html" class="back-link">← Volver al inicio</a>
+
+  <header style="margin-bottom:2rem;">
+    <div class="eyebrow">Laboratorio 2 · Teoría de Números</div>
+    <h1>Congruencias vs. Igualdades</h1>
+    <p class="subtitle">
+      Las congruencias se parecen mucho a las igualdades: podemos sumar, restar y multiplicar de ambos lados.
+      Pero hay una trampa con la división. Explorá las diferencias acá abajo.
+    </p>
+  </header>
+
+  <!-- STATIC COMPARISON TABLE -->
+  <div class="compare-grid">
+    <div class="col-header col-eq"><span>a = b</span>Igualdad</div>
+    <div class="col-header col-cong"><span>a ≡ b (mod m)</span>Congruencia</div>
+  </div>
+
+  <div class="op-section">
+    <div class="op-label">➕ Suma — agregar c a ambos lados</div>
+    <div class="op-row">
+      <div class="op-card">
+        <div class="formula">Si  a = b<br>entonces  a + c = b + c</div>
+        <div class="result"><span class="badge ok">✓</span> Siempre válido</div>
+      </div>
+      <div class="op-card">
+        <div class="formula">Si  a ≡ b (mod m)<br>entonces  a+c ≡ b+c (mod m)</div>
+        <div class="result"><span class="badge ok">✓</span> Siempre válido</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="op-section">
+    <div class="op-label">➖ Resta — restar c a ambos lados</div>
+    <div class="op-row">
+      <div class="op-card">
+        <div class="formula">Si  a = b<br>entonces  a − c = b − c</div>
+        <div class="result"><span class="badge ok">✓</span> Siempre válido</div>
+      </div>
+      <div class="op-card">
+        <div class="formula">Si  a ≡ b (mod m)<br>entonces  a−c ≡ b−c (mod m)</div>
+        <div class="result"><span class="badge ok">✓</span> Siempre válido</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="op-section">
+    <div class="op-label">✖️ Multiplicación — multiplicar ambos lados por c</div>
+    <div class="op-row">
+      <div class="op-card">
+        <div class="formula">Si  a = b<br>entonces  a · c = b · c</div>
+        <div class="result"><span class="badge ok">✓</span> Siempre válido</div>
+      </div>
+      <div class="op-card">
+        <div class="formula">Si  a ≡ b (mod m)<br>entonces  a·c ≡ b·c (mod m)</div>
+        <div class="result"><span class="badge ok">✓</span> Siempre válido</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="op-section">
+    <div class="op-label">➗ División — dividir ambos lados por c</div>
+    <div class="op-row">
+      <div class="op-card">
+        <div class="formula">Si  a = b  y  c ≠ 0<br>entonces  a/c = b/c</div>
+        <div class="result"><span class="badge ok">✓</span> Siempre válido (c ≠ 0)</div>
+      </div>
+      <div class="op-card">
+        <div class="formula">Si  a ≡ b (mod m)<br>¿entonces  a/c ≡ b/c (mod m)?</div>
+        <div class="result"><span class="badge err">✗</span> ¡No siempre! Depende de c y m</div>
+      </div>
+    </div>
+    <div class="op-row" style="margin-top:0;">
+      <div style="grid-column: 2;">
+        <div class="op-card" style="border-color:#FAC775; background:var(--amber-light);">
+          <div class="formula" style="color:var(--amber);">Solo si mcd(c, m) = 1<br>(c y m son coprimos)</div>
+          <div class="result" style="background:#fff3dc;"><span class="badge warn">!</span> <span style="color:var(--amber);">Válido solo en ese caso</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- INTERACTIVE EXPLORER -->
+  <div class="interactive">
+    <h2>Explorá vos mismo</h2>
+    <p class="desc">
+      Ingresá dos números congruentes y un módulo, elegí una operación y un valor, y mirá si la congruencia se mantiene.
+    </p>
+
+    <div class="inputs">
+      <div class="field">
+        <label>a</label>
+        <input type="number" id="val-a" value="12">
+      </div>
+      <div class="field">
+        <label>b</label>
+        <input type="number" id="val-b" value="6">
+      </div>
+      <div class="field">
+        <label>mod m</label>
+        <input type="number" id="val-m" value="6" min="2">
+      </div>
+      <div class="field">
+        <label>valor c</label>
+        <input type="number" id="val-c" value="2">
+      </div>
+    </div>
+
+    <div id="cong-check" style="font-size:13px; margin-bottom:1rem; padding:8px 12px; border-radius:8px; background:var(--bg); font-family:var(--mono);"></div>
+
+    <div class="op-selector">
+      <button class="op-btn active" onclick="setOp('+',this)">+ Sumar c</button>
+      <button class="op-btn" onclick="setOp('-',this)">− Restar c</button>
+      <button class="op-btn" onclick="setOp('*',this)">× Multiplicar por c</button>
+      <button class="op-btn" onclick="setOp('/',this)">÷ Dividir por c</button>
+    </div>
+
+    <div class="result-grid" id="result-grid"></div>
+  </div>
+
+  <!-- DIVISION WARNING -->
+  <div class="warning-box">
+    <b>⚠️ El contraejemplo clásico de la división:</b><br>
+    Sabemos que 12 ≡ 6 (mod 6). Si dividimos ambos lados por 2:<br>
+    ¿6 ≡ 3 (mod 6)? → 6 − 3 = 3, y 3 no es múltiplo de 6. <b>¡Falso!</b><br><br>
+    El problema: mcd(2, 6) = 2 ≠ 1, así que la división no está permitida.
+  </div>
+
+  <div class="tip-box">
+    <b>✓ ¿Cuándo sí podemos dividir?</b><br>
+    Si mcd(c, m) = 1, entonces c tiene inverso modular y la división es válida.
+    <span class="formula">a ≡ b (mod m)  y  mcd(c, m) = 1  ⟹  a/c ≡ b/c (mod m)</span>
+    Ejemplo: <b>35 ≡ 15 (mod 4)</b>. Queremos dividir por 5.<br>
+    mcd(5, 4) = 1 ✓ → división permitida.<br>
+    35 ÷ 5 = <b>7</b> &nbsp;y&nbsp; 15 ÷ 5 = <b>3</b> &nbsp;→&nbsp; <b>7 ≡ 3 (mod 4)</b> ✓<br>
+    Verificación: 7 − 3 = 4, que es múltiplo de 4. ¡La congruencia se mantiene!
+  </div>
+
+  <footer>Laboratorio 2 · Jóvenes Talentos · Módulo de Teoría de Números</footer>
+
+</div>
+
+<script>
+let currentOp = '+';
+
+function mod(a, m) { return ((a % m) + m) % m; }
+
+function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while(b){ [a,b]=[b,a%b]; } return a; }
+
+function setOp(op, btn) {
+  currentOp = op;
+  document.querySelectorAll('.op-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  compute();
+}
+
+function applyOp(x, c, op) {
+  if (op === '+') return x + c;
+  if (op === '-') return x - c;
+  if (op === '*') return x * c;
+  if (op === '/') return x / c;
+}
+
+function opSymbol(op) {
+  return { '+': '+', '-': '−', '*': '×', '/': '÷' }[op];
+}
+
+function compute() {
+  const a = parseInt(document.getElementById('val-a').value) || 0;
+  const b = parseInt(document.getElementById('val-b').value) || 0;
+  const m = Math.max(2, parseInt(document.getElementById('val-m').value) || 6);
+  const c = parseInt(document.getElementById('val-c').value) || 1;
+
+  const isCong = mod(a, m) === mod(b, m);
+  const check = document.getElementById('cong-check');
+  check.style.background = isCong ? 'var(--teal-light)' : 'var(--red-light)';
+  check.style.color = isCong ? 'var(--teal)' : 'var(--red)';
+  check.innerHTML = isCong
+    ? `✓ &nbsp;${a} ≡ ${b} (mod ${m}) &nbsp;→&nbsp; ${mod(a,m)} = ${mod(b,m)} &nbsp;✓ Son congruentes, podés operar`
+    : `✗ &nbsp;${a} ≢ ${b} (mod ${m}) &nbsp;→&nbsp; ${mod(a,m)} ≠ ${mod(b,m)} &nbsp;⚠ No son congruentes entre sí`;
+
+  const grid = document.getElementById('result-grid');
+
+  if (currentOp === '/' && c === 0) {
+    grid.innerHTML = `<div class="result-card err" style="grid-column:1/-1"><div class="rc-label">Error</div><div class="rc-formula">No se puede dividir por 0</div></div>`;
+    return;
+  }
+
+  // Congruence side
+  let congValid = false;
+  let congNote = '';
+  let congClass = 'err';
+  let congLeftMod, congRightMod;
+
+  if (currentOp === '/') {
+    if (c === 0) {
+      congNote = 'No se puede dividir por 0.';
+    } else {
+      const g = gcd(c, m);
+      if (g === 1) {
+        // find inverse
+        let inv = -1;
+        for (let i = 1; i < m; i++) { if (mod(i * c, m) === 1) { inv = i; break; } }
+        if (inv !== -1) {
+          congLeftMod  = mod(a * inv, m);
+          congRightMod = mod(b * inv, m);
+          congValid = congLeftMod === congRightMod;
+          congClass = congValid ? 'ok' : 'err';
+          congNote = `mcd(${c}, ${m}) = 1 → c es coprimo con m ✓<br>Inverso de ${c} mod ${m} es ${inv}`;
+        }
+      } else {
+        congLeftMod  = mod(a, m);
+        congRightMod = mod(b, m);
+        congNote = `mcd(${c}, ${m}) = ${g} ≠ 1 → ¡División no permitida!<br>El resultado puede ser incorrecto.`;
+        const aDiv = a / c, bDiv = b / c;
+        congValid = Number.isInteger(aDiv) && Number.isInteger(bDiv) && mod(aDiv, m) === mod(bDiv, m);
+        congClass = 'warn';
+      }
+    }
+  } else {
+    const resA = applyOp(a, c, currentOp);
+    const resB = applyOp(b, c, currentOp);
+    congLeftMod  = mod(resA, m);
+    congRightMod = mod(resB, m);
+    congValid = congLeftMod === congRightMod;
+    congClass = congValid ? 'ok' : 'err';
+    congNote = congValid
+      ? `${resA} ≡ ${resB} (mod ${m}) ✓`
+      : `${resA} ≢ ${resB} (mod ${m}) ✗ &nbsp;(${congLeftMod} ≠ ${congRightMod})`;
+  }
+
+  const sym = opSymbol(currentOp);
+
+  let congFormulaLeft, congFormulaRight;
+  if (currentOp === '/') {
+    congFormulaLeft  = `${a} ÷ ${c}`;
+    congFormulaRight = `${b} ÷ ${c}`;
+  } else {
+    congFormulaLeft  = `${a} ${sym} ${c} = ${applyOp(a,c,currentOp)}`;
+    congFormulaRight = `${b} ${sym} ${c} = ${applyOp(b,c,currentOp)}`;
+  }
+
+  grid.innerHTML = `
+    <div class="result-card ${congClass}" style="grid-column:1/-1">
+      <div class="rc-label">Congruencia (mod ${m})</div>
+      <div class="rc-formula">
+        ${congFormulaLeft}<br>
+        ${congFormulaRight}
+      </div>
+      <div class="rc-note">${congNote}</div>
+    </div>
+  `;
+}
+
+// live update
+['val-a','val-b','val-m','val-c'].forEach(id =>
+  document.getElementById(id).addEventListener('input', compute)
+);
+
+compute();
+</script>
+</body>
+</html>
