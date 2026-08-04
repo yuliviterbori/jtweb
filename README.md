@@ -9,13 +9,12 @@ juegos, exploradores y comparativos con los que el estudiante puede "jugar" para
 
 ## El curso
 
-Tres módulos a lo largo del año:
+Dos módulos a lo largo del año:
 
-1. **Álgebra**
-2. **Teoría de Números**
-3. **Geometría**
+1. **Teoría de Números**
+2. **Geometría**
 
-La página de inicio muestra cada módulo con su estado y enlaza a los tópicos disponibles.
+La página de inicio enlaza a los tópicos disponibles de cada módulo.
 
 ## ¿Cómo veo el sitio?
 
@@ -23,18 +22,33 @@ No hace falta instalar nada. Abrí el archivo **`index.html`** con doble clic y 
 en el navegador. Desde ahí se navega a cada tópico, y cada tópico tiene un enlace
 "← Volver al inicio".
 
-## ¿Querés sumar un tópico nuevo?
+## Organización de los archivos
+
+Cada módulo tiene su carpeta; `index.html` queda en la raíz:
+
+```
+index.html                 ← página de inicio
+teoria-numeros/            ← Teoría de Números
+  vasos.html
+  congruencias_vs_igualdades.html
+  juego_143.html
+geometria/                 ← Geometría
+  circunferencia.html
+```
 
 Cada página es **un solo archivo** HTML autocontenido (incluye su propio diseño y la parte
-interactiva adentro). Para agregar un tópico:
+interactiva adentro).
 
-1. **Copiá** una página que ya exista (por ejemplo `congruencias_vs_igualdades.html`) y
-   renombrá la copia con un nombre claro (ej. `triangulos.html`).
-2. **Reemplazá el contenido** por el de tu tópico. Conservá el enlace
-   "← Volver al inicio" que está arriba de todo.
-3. **Enlazala desde el inicio**: en `index.html`, dentro del módulo que corresponda,
-   copiá una de las tarjetas `<a class="topic"> … </a>` existentes y cambiá el enlace,
-   el título y la descripción.
+## ¿Querés sumar un tópico nuevo?
+
+1. **Copiá** una página que ya exista del mismo módulo (por ejemplo
+   `teoria-numeros/congruencias_vs_igualdades.html`) y guardá la copia con un nombre claro
+   dentro de la carpeta del módulo (ej. `geometria/triangulos.html`).
+2. **Reemplazá el contenido** por el de tu tópico. Conservá el enlace "← Volver al inicio"
+   de arriba (apunta a `../index.html`).
+3. **Enlazala desde el inicio**: en `index.html`, dentro del módulo que corresponda, copiá
+   una de las tarjetas `<a class="topic"> … </a>` existentes y cambiá el enlace (con la
+   carpeta, ej. `geometria/triangulos.html`), el título y la descripción.
 
 Si trabajás con un asistente de IA (Claude Code), el archivo `CLAUDE.md` tiene el contexto
 del proyecto para que te ayude a mantener el estilo.
@@ -43,9 +57,10 @@ del proyecto para que te ayude a mantener el estilo.
 
 - **Sin instalaciones ni frameworks.** Solo HTML, CSS y JavaScript dentro de cada archivo.
   La única dependencia externa son las tipografías de Google Fonts.
-- **Diseño compartido.** Todas las páginas usan la misma paleta y tipografías (definidas
-  arriba de cada archivo, en el bloque `:root`): fondo crema, violeta de acento, y verde /
-  rojo / ámbar para marcar correcto / error / advertencia. Reutilizá ese estilo.
+- **Diseño por módulo.** Teoría de Números usa un tema claro (fondo crema, violeta de
+  acento); Geometría usa un tema de "pizarrón" oscuro (fondo azul, dorado). Al crear una
+  página nueva, seguí el estilo del resto de su módulo (está definido en el bloque `:root`
+  arriba de cada archivo).
 - **Idioma y tono.** Todo en español, con voseo ("tenés", "podés", "mirá"), cercano y
   didáctico, pensado para estudiantes adolescentes. Las explicaciones matemáticas tienen
   que ser correctas y rigurosas.

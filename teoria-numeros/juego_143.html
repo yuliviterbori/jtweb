@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El juego del múltiplo de 143 — Laboratorio 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #F7F6F2;
+  --surface: #ffffff;
+  --border: #E4E2D8;
+  --text: #1C1B18;
+  --text-2: #6B6960;
+  --text-3: #9E9C94;
+  --purple: #534AB7;
+  --purple-light: #EEEDFE;
+  --purple-mid: #AFA9EC;
+  --teal: #0F6E56;
+  --teal-light: #E1F5EE;
+  --red: #A32D2D;
+  --red-light: #FCEBEB;
+  --amber: #854F0B;
+  --amber-light: #FAEEDA;
+  --radius: 10px;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Inter', sans-serif;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 2rem 1rem 4rem;
+}
+
+.page { max-width: 780px; margin: 0 auto; }
+
+.back-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 500; color: var(--text-2);
+  text-decoration: none; margin-bottom: 1.5rem;
+  transition: color 0.12s;
+}
+.back-link:hover { color: var(--purple); }
+
+/* HEADER */
+.eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--purple); margin-bottom: 10px;
+}
+h1 { font-size: 28px; font-weight: 700; line-height: 1.25; margin-bottom: 10px; }
+.subtitle { font-size: 15px; color: var(--text-2); line-height: 1.7; margin-bottom: 2rem; }
+
+/* PROBLEM BOX */
+.problem-box {
+  background: var(--purple-light);
+  border: 1px solid var(--purple-mid);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 2.5rem;
+}
+.problem-label {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--purple); margin-bottom: 10px;
+}
+.problem-box p { font-size: 14px; color: #3C3489; line-height: 1.7; }
+.problem-box b { color: #26215C; font-weight: 600; }
+
+.blanks {
+  display: flex; gap: 8px; justify-content: center; margin: 16px 0 4px;
+}
+.blank {
+  width: 34px; height: 42px;
+  border-bottom: 3px solid var(--purple-mid);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 20px; font-weight: 600; color: var(--purple);
+}
+
+/* SECTIONS / STEPS */
+.step { margin-bottom: 2.75rem; }
+.step-num {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--text-3); margin-bottom: 6px;
+}
+.step h2 { font-size: 19px; font-weight: 600; line-height: 1.3; margin-bottom: 12px; }
+.step p { font-size: 14.5px; color: var(--text-2); line-height: 1.75; margin-bottom: 12px; }
+.step p b { color: var(--text); font-weight: 600; }
+.mono { font-family: var(--mono); }
+
+.formula-block {
+  font-family: var(--mono);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  font-size: 14px; line-height: 1.9;
+  color: var(--text);
+  margin: 12px 0;
+  overflow-x: auto;
+}
+.formula-block .hl { color: var(--purple); font-weight: 600; }
+
+/* RESTOS TABLE */
+.table-wrap { overflow-x: auto; margin: 12px 0; }
+table.restos {
+  width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 13px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden;
+}
+table.restos th, table.restos td {
+  padding: 9px 12px; text-align: center; border-bottom: 1px solid var(--border);
+}
+table.restos th {
+  font-family: var(--sans); font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-2);
+  background: var(--bg);
+}
+table.restos td:first-child, table.restos th:first-child { text-align: left; color: var(--text-2); }
+table.restos tr:last-child td { border-bottom: none; }
+table.restos tr.key td { background: var(--amber-light); color: #633806; font-weight: 600; }
+
+/* PAIRS DIAGRAM */
+.pairs {
+  display: flex; flex-direction: column; gap: 8px; align-items: center;
+  margin: 6px 0 4px;
+}
+.pairs .prow { display: flex; align-items: center; gap: 8px; }
+.pcell {
+  width: 46px; height: 52px; border-radius: 8px;
+  border: 2px solid var(--border); background: var(--surface);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 11px; color: var(--text-2);
+}
+.pcell b { font-size: 15px; color: var(--text); }
+.pcell.a { border-color: var(--red-light); background: var(--red-light); color: var(--red); }
+.pcell.a b { color: var(--red); }
+.pcell.d { border-color: var(--teal-light); background: var(--teal-light); color: var(--teal); }
+.pcell.d b { color: var(--teal); }
+.plink { font-family: var(--mono); font-size: 12px; color: var(--purple); font-weight: 600; white-space: nowrap; }
+
+/* TESTER / CARD */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin: 12px 0;
+}
+.tester-digits { display: flex; gap: 6px; justify-content: center; margin-bottom: 4px; flex-wrap: wrap; }
+.tester-digits .grp { display: flex; gap: 6px; }
+.tester-digits .grp-sep { width: 14px; }
+.digit-input {
+  width: 44px; height: 54px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  font-family: var(--mono); font-size: 22px; font-weight: 600; text-align: center;
+  color: var(--text); outline: none;
+  transition: border-color 0.12s;
+}
+.digit-input:focus { border-color: var(--purple); }
+.grp.abc .digit-input { border-color: #F0C6C6; }
+.grp.def .digit-input { border-color: #A9E3CF; }
+.grp-labels { display: flex; gap: 6px; justify-content: center; margin-bottom: 14px; font-size: 11px; color: var(--text-3); font-weight: 600; letter-spacing: 0.05em; }
+.grp-labels .lab { width: 150px; text-align: center; }
+.lab.abc { color: var(--red); }
+.lab.def { color: var(--teal); }
+
+.example-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px; }
+.mini-btn {
+  padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-2);
+  font-family: var(--sans); font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: all 0.12s;
+}
+.mini-btn:hover { border-color: var(--purple); color: var(--purple); background: var(--purple-light); }
+
+.readout { font-family: var(--mono); font-size: 13.5px; line-height: 2; color: var(--text); }
+.readout .row { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; border-bottom: 1px solid var(--bg); flex-wrap: wrap; }
+.readout .row:last-child { border-bottom: none; }
+.readout .lbl { color: var(--text-2); }
+
+.verdict {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; border-radius: var(--radius);
+  margin-top: 14px; font-size: 14px; font-weight: 500;
+}
+.verdict.yes { background: var(--teal-light); color: var(--teal); border: 1px solid #9FE1CB; }
+.verdict.no  { background: var(--red-light);  color: var(--red);  border: 1px solid #F7C1C1; }
+.verdict-icon {
+  width: 22px; height: 22px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+}
+.verdict.yes .verdict-icon { background: var(--teal); color: #fff; }
+.verdict.no  .verdict-icon { background: var(--red);  color: #fff; }
+
+/* GAME */
+.role-toggle { display: flex; gap: 8px; margin-bottom: 6px; }
+.role-toggle .rbtn {
+  flex: 1; padding: 10px 12px; border-radius: var(--radius);
+  border: 1.5px solid var(--border); background: var(--bg); color: var(--text-2);
+  font-family: var(--sans); font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all 0.12s; text-align: center;
+}
+.role-toggle .rbtn small { display: block; font-size: 11px; font-weight: 400; color: var(--text-3); margin-top: 2px; }
+.role-toggle .rbtn:hover { border-color: var(--purple); }
+.role-toggle .rbtn.active { background: var(--purple); border-color: var(--purple); color: #fff; }
+.role-toggle .rbtn.active small { color: #D9D6F5; }
+
+.game-board { display: flex; gap: 8px; justify-content: center; margin: 18px 0 6px; }
+.slot {
+  width: 46px; height: 58px; border-radius: 8px;
+  border: 2px solid var(--border); background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 26px; font-weight: 600; color: var(--text);
+  transition: all 0.15s;
+}
+.slot.empty.clickable { cursor: pointer; }
+.slot.empty.clickable:hover { border-color: var(--purple); background: var(--purple-light); }
+.slot.selected { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-light); background: var(--purple-light); }
+.slot.hint { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-light); }
+.slot.andres { color: var(--purple); border-color: var(--purple-mid); }
+.slot.blas   { color: var(--amber); border-color: #FAC775; }
+.slot-idx-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+.slot-idx { width: 46px; text-align: center; font-size: 10px; font-weight: 500; color: var(--text-3); }
+
+.turn-msg {
+  text-align: center; font-size: 14px; font-weight: 500; color: var(--text);
+  padding: 10px; border-radius: 8px; background: var(--bg); margin-bottom: 14px;
+  min-height: 42px; display: flex; align-items: center; justify-content: center;
+}
+.turn-msg.win-andres { background: var(--purple-light); color: var(--purple); }
+.turn-msg.win-blas   { background: var(--amber-light); color: var(--amber); }
+
+.digit-pad { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; margin-bottom: 12px; }
+.pad-btn {
+  aspect-ratio: 1; border-radius: 8px; border: 1.5px solid var(--border);
+  background: var(--surface); color: var(--text);
+  font-family: var(--mono); font-size: 17px; font-weight: 600; cursor: pointer;
+  transition: all 0.12s;
+}
+.pad-btn:hover:not(:disabled) { border-color: var(--purple); background: var(--purple-light); color: var(--purple); }
+.pad-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pad-btn.winning { border-color: var(--teal); background: var(--teal-light); color: var(--teal); }
+
+.game-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+.game-controls button {
+  flex: 1; padding: 9px 12px; border-radius: var(--radius);
+  border: 1.5px solid var(--border); background: transparent; color: var(--text-2);
+  font-family: var(--sans); font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all 0.12s;
+}
+.game-controls button:hover { border-color: var(--purple); color: var(--purple); background: var(--purple-light); }
+.note { font-size: 12px; color: var(--text-3); text-align: center; margin-top: 12px; line-height: 1.6; }
+
+/* REVEAL / ANSWER */
+.reveal-row { margin: 12px 0 1.5rem; }
+.btn-reveal {
+  padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-3);
+  font-family: var(--sans); font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: all 0.12s;
+}
+.btn-reveal:hover, .btn-reveal.active { border-color: var(--purple); color: var(--purple); background: var(--purple-light); }
+
+.answer-box {
+  background: var(--amber-light); border: 1px solid #FAC775;
+  border-radius: var(--radius); padding: 18px 20px;
+  font-size: 14px; color: #633806; line-height: 1.85; display: none;
+}
+.answer-box.show { display: block; }
+.answer-box b { color: #412402; }
+.answer-box .big { font-size: 15px; font-weight: 600; color: #412402; display: block; margin-bottom: 8px; }
+.answer-box .formula {
+  font-family: var(--mono); font-size: 13px;
+  background: rgba(255,255,255,0.55); border-radius: 6px;
+  padding: 9px 13px; margin: 10px 0; display: block; overflow-x: auto;
+}
+.answer-box ul { margin: 8px 0 8px 18px; }
+.answer-box li { margin-bottom: 6px; }
+
+.divider { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+footer {
+  text-align: center; font-size: 12px; color: var(--text-3);
+  margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border);
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <a href="../index.html" class="back-link">← Volver al inicio</a>
+
+  <header>
+    <div class="eyebrow">Laboratorio 2 · Teoría de Números</div>
+    <h1>El juego del múltiplo de 143</h1>
+    <p class="subtitle">
+      Un problema de estrategia que se resuelve con congruencias módulo 11 y 13.
+      La clave está en mirar los restos de las potencias de 10.
+    </p>
+  </header>
+
+  <div class="problem-box">
+    <div class="problem-label">El problema</div>
+    <p>
+      Andrés y Blas juegan por turnos (empieza <b>Andrés</b>) colocando dígitos del
+      <b>1 al 9</b> en seis espacios. Se puede repetir. <b>El orden de las cifras no importa</b>:
+      en su turno, cada uno elige en qué casilla vacía poner su dígito. Si el número de seis
+      cifras que se forma es <b>múltiplo de 143</b>, gana Blas; si no, gana Andrés.
+      ¿Quién tiene la estrategia ganadora y cuál es?
+    </p>
+    <div class="blanks">
+      <div class="blank">_</div><div class="blank">_</div><div class="blank">_</div>
+      <div class="blank">_</div><div class="blank">_</div><div class="blank">_</div>
+    </div>
+  </div>
+
+  <!-- PASO 1 -->
+  <section class="step">
+    <div class="step-num">Paso 1 · Descomponer</div>
+    <h2>Los restos de las potencias de 10</h2>
+    <p>
+      Como <b>143 = 11 × 13</b>, un número es múltiplo de 143 exactamente cuando es
+      múltiplo de <b>11</b> <i>y</i> de <b>13</b> a la vez. Escribimos el número como
+      <span class="mono">a₅a₄a₃a₂a₁a₀</span> (con a₅ la cifra de mayor valor) y buscamos
+      el resto de cada potencia de 10:
+    </p>
+    <div class="formula-block">
+      N = a₅·10⁵ + a₄·10⁴ + a₃·10³ + a₂·10² + a₁·10 + a₀
+    </div>
+    <div class="table-wrap">
+      <table class="restos">
+        <thead>
+          <tr><th>Potencia</th><th>Valor</th><th>resto mód 11</th><th>resto mód 13</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>10⁰</td><td>1</td><td>1</td><td>1</td></tr>
+          <tr><td>10¹</td><td>10</td><td>10 ≡ −1</td><td>10</td></tr>
+          <tr><td>10²</td><td>100</td><td>1</td><td>9</td></tr>
+          <tr class="key"><td>10³</td><td>1000</td><td>10 ≡ −1</td><td>12 ≡ −1</td></tr>
+          <tr><td>10⁴</td><td>10000</td><td>1</td><td>3</td></tr>
+          <tr><td>10⁵</td><td>100000</td><td>10 ≡ −1</td><td>4</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      La fila clave es <b>10³ = 1000</b>: deja resto <b>−1</b> tanto módulo 11 como
+      módulo 13. No es casualidad. Recordá que
+      <span class="mono">1001 = 7 · 11 · 13</span>, así que 1001 es múltiplo de 143 y
+    </p>
+    <div class="formula-block">
+      1000 = 1001 − 1 &nbsp;⟹&nbsp; <span class="hl">1000 ≡ −1 (mód 11), (mód 13) y (mód 143)</span>
+    </div>
+  </section>
+
+  <!-- PASO 2 -->
+  <section class="step">
+    <div class="step-num">Paso 2 · Emparejar las casillas</div>
+    <h2>Cada casilla tiene su pareja</h2>
+    <p>
+      Usando que 1000 ≡ −1, cada potencia alta queda ligada a una baja:
+      <span class="mono">10⁵ ≡ −10²</span>, &nbsp;<span class="mono">10⁴ ≡ −10¹</span>,
+      &nbsp;<span class="mono">10³ ≡ −10⁰</span>. Es decir, cada cifra tiene una
+      <b>pareja con peso opuesto</b> módulo 143:
+    </p>
+    <div class="pairs">
+      <div class="prow">
+        <div class="pcell a"><b>a₅</b>10⁵</div>
+        <span class="plink">↔ opuestos ↔</span>
+        <div class="pcell d"><b>a₂</b>10²</div>
+      </div>
+      <div class="prow">
+        <div class="pcell a"><b>a₄</b>10⁴</div>
+        <span class="plink">↔ opuestos ↔</span>
+        <div class="pcell d"><b>a₁</b>10¹</div>
+      </div>
+      <div class="prow">
+        <div class="pcell a"><b>a₃</b>10³</div>
+        <span class="plink">↔ opuestos ↔</span>
+        <div class="pcell d"><b>a₀</b>10⁰</div>
+      </div>
+    </div>
+    <p>
+      Consecuencia: si las dos cifras de una pareja son <b>iguales</b>, esa pareja aporta
+      <b>0</b> módulo 143. Y si se igualan las tres parejas, las dos mitades
+      (<span class="mono" style="color:var(--red)">ABC = a₅a₄a₃</span> y
+      <span class="mono" style="color:var(--teal)">DEF = a₂a₁a₀</span>) quedan idénticas: el
+      número es de la forma <span class="mono" style="color:var(--purple)">ABCABC = ABC·1001</span>,
+      múltiplo de 143. Probalo:
+    </p>
+
+    <div class="card">
+      <div class="grp-labels">
+        <div class="lab abc">a₅ a₄ a₃ · mitad ABC</div>
+        <div class="lab def">a₂ a₁ a₀ · mitad DEF</div>
+      </div>
+      <div class="tester-digits">
+        <div class="grp abc">
+          <input class="digit-input" id="t0" maxlength="1" inputmode="numeric" value="1">
+          <input class="digit-input" id="t1" maxlength="1" inputmode="numeric" value="2">
+          <input class="digit-input" id="t2" maxlength="1" inputmode="numeric" value="3">
+        </div>
+        <div class="grp-sep"></div>
+        <div class="grp def">
+          <input class="digit-input" id="t3" maxlength="1" inputmode="numeric" value="4">
+          <input class="digit-input" id="t4" maxlength="1" inputmode="numeric" value="5">
+          <input class="digit-input" id="t5" maxlength="1" inputmode="numeric" value="6">
+        </div>
+      </div>
+      <div class="example-btns">
+        <button class="mini-btn" onclick="setDigits('473473')">Espejo → 473473</button>
+        <button class="mini-btn" onclick="setDigits('123123')">Espejo → 123123</button>
+        <button class="mini-btn" onclick="setDigits('143286')">Otro múltiplo → 143286</button>
+        <button class="mini-btn" onclick="setDigits('123456')">Reiniciar → 123456</button>
+      </div>
+      <div class="readout" id="tester-readout"></div>
+      <div class="verdict" id="tester-verdict"></div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- PASO 3 -->
+  <section class="step">
+    <div class="step-num">Paso 3 · Jugar</div>
+    <h2>¿Quién gana? Jugá contra la compu</h2>
+    <p>
+      Elegí un rol. La computadora juega <b>perfecto</b>: si tenés una estrategia
+      ganadora y la seguís, ganás; si te equivocás, te castiga. En tu turno, tocá una
+      <b>casilla vacía</b> y después un <b>dígito</b>.
+    </p>
+
+    <div class="card">
+      <div class="role-toggle">
+        <button class="rbtn active" id="role-andres" onclick="setRole('andres')">
+          Jugar como Andrés <small>evitar el múltiplo · empieza</small>
+        </button>
+        <button class="rbtn" id="role-blas" onclick="setRole('blas')">
+          Jugar como Blas <small>formar el múltiplo</small>
+        </button>
+      </div>
+
+      <div class="game-board" id="game-board"></div>
+      <div class="slot-idx-row" id="slot-idx-row"></div>
+
+      <div class="turn-msg" id="turn-msg"></div>
+
+      <div class="digit-pad" id="digit-pad"></div>
+
+      <div class="game-controls">
+        <button onclick="hint()">💡 Pista</button>
+        <button onclick="resetGame()">↺ Reiniciar partida</button>
+      </div>
+      <div class="note">Empieza Andrés. Cada uno, en su turno, elige una casilla vacía y coloca un dígito del 1 al 9.</div>
+    </div>
+  </section>
+
+  <!-- ANSWER -->
+  <section class="step">
+    <div class="step-num">La solución</div>
+    <h2>¿Quién tiene la estrategia ganadora?</h2>
+    <div class="reveal-row">
+      <button class="btn-reveal" id="ans-btn" onclick="toggleAnswer()">🔍 Mostrar respuesta y estrategia</button>
+    </div>
+    <div class="answer-box" id="answer-box">
+      <span class="big">Gana Blas.</span>
+      Ya vimos que cada cifra tiene una <b>pareja</b> con peso opuesto módulo 143:
+      <span class="formula">a₅ ↔ a₂ &nbsp;·&nbsp; a₄ ↔ a₁ &nbsp;·&nbsp; a₃ ↔ a₀</span>
+      <b>Estrategia de Blas</b> (que juega segundo): responde a cada jugada de Andrés
+      poniendo <b>el mismo dígito en la casilla pareja</b>.
+      <ul>
+        <li>Si Andrés pone <span class="mono">a₂</span>, Blas pone <span class="mono">a₅</span> (o al revés).</li>
+        <li>Si Andrés pone <span class="mono">a₄</span>, Blas pone <span class="mono">a₁</span> (o al revés).</li>
+        <li>Si Andrés pone <span class="mono">a₀</span>, Blas pone <span class="mono">a₃</span> (o al revés).</li>
+      </ul>
+      <b>Siempre puede hacerlo:</b> Andrés siempre abre una pareja nueva (tras cada respuesta
+      de Blas las parejas quedan completas o vacías) y Blas la cierra con el mismo dígito, así
+      cada pareja aporta <b>0</b> módulo 143.
+      <br><br>
+      Al final las dos mitades quedan idénticas: el número es de la forma
+      <span class="mono" style="color:var(--purple)">ABCABC</span>, y
+      <span class="formula">ABCABC = ABC · 1001 = ABC · 7 · 11 · 13</span>
+      siempre es múltiplo de 143. <b>Blas gana pase lo que pase.</b> 🎉
+      <br><br>
+      Detalle importante: esto funciona <b>justamente porque el orden de las cifras no importa</b>
+      (cada uno elige la casilla). Si el número se llenara en orden fijo, el análisis cambia y la
+      ventaja pasa a Andrés.
+    </div>
+  </section>
+
+  <footer>Laboratorio 2 · Jóvenes Talentos · Módulo de Teoría de Números</footer>
+
+</div>
+
+<script>
+/* ---------- utilidades ---------- */
+function mod(n, m) { return ((n % m) + m) % m; }
+const W = [43, 133, 142, 100, 10, 1]; // 10^5..10^0  módulo 143
+const PAIRS = [[0, 3], [1, 4], [2, 5]];
+const SLOT_LABEL = ['a₅', 'a₄', 'a₃', 'a₂', 'a₁', 'a₀']; // casillas de izq. a der.
+
+/* ---------- PASO 2: tester ---------- */
+function readTester() {
+  const d = [];
+  for (let i = 0; i < 6; i++) {
+    let v = parseInt(document.getElementById('t' + i).value, 10);
+    if (isNaN(v) || v < 1) v = 1;
+    if (v > 9) v = 9;
+    d.push(v);
+  }
+  return d;
+}
+function setDigits(str) {
+  for (let i = 0; i < 6; i++) document.getElementById('t' + i).value = str[i];
+  updateTester();
+}
+function updateTester() {
+  const d = readTester();
+  const ABC = d[0]*100 + d[1]*10 + d[2];
+  const DEF = d[3]*100 + d[4]*10 + d[5];
+  const N = ABC * 1000 + DEF;
+  const diff = DEF - ABC;
+  const r143 = mod(diff, 143);
+  const isMult = r143 === 0;
+
+  document.getElementById('tester-readout').innerHTML = `
+    <div class="row"><span class="lbl">Número N</span><span>${N}</span></div>
+    <div class="row"><span class="lbl">ABC / DEF</span><span style="color:var(--red)">${ABC}</span> <span style="color:var(--teal)">${DEF}</span></div>
+    <div class="row"><span class="lbl">DEF − ABC</span><span>${DEF} − ${ABC} = ${diff}</span></div>
+    <div class="row"><span class="lbl">N mód 143</span><span>${r143}</span></div>
+    <div class="row"><span class="lbl">N mód 11 &nbsp;·&nbsp; mód 13</span><span>${mod(N,11)} &nbsp;·&nbsp; ${mod(N,13)}</span></div>
+  `;
+
+  const v = document.getElementById('tester-verdict');
+  v.className = 'verdict ' + (isMult ? 'yes' : 'no');
+  v.innerHTML = isMult
+    ? `<span class="verdict-icon">✓</span> ${N} es múltiplo de 143 (= 143 × ${N/143}). Acá ganaría <b>&nbsp;Blas</b>.`
+    : `<span class="verdict-icon">✕</span> ${N} no es múltiplo de 143. Acá ganaría <b>&nbsp;Andrés</b>.`;
+}
+for (let i = 0; i < 6; i++) {
+  document.getElementById('t' + i).addEventListener('input', function() {
+    this.value = this.value.replace(/[^1-9]/g, '').slice(0, 1);
+    updateTester();
+    if (this.value && i < 5) document.getElementById('t' + (i + 1)).focus();
+  });
+}
+
+/* ---------- PASO 3: juego (colocación libre) con minimax exacto ---------- */
+function popcount(m) { let c = 0; while (m) { c += m & 1; m >>= 1; } return c; }
+const memo = new Map();
+// true si ANDRÉS (el que evita) gana con juego óptimo desde (mask, acc)
+function value(mask, acc) {
+  const filled = popcount(mask);
+  if (filled === 6) return mod(acc, 143) !== 0;
+  const key = mask * 143 + acc;
+  if (memo.has(key)) return memo.get(key);
+  const andres = (filled % 2 === 0);
+  let res;
+  if (andres) {
+    res = false;
+    for (let pos = 0; pos < 6 && !res; pos++) {
+      if (mask & (1 << pos)) continue;
+      for (let dg = 1; dg <= 9; dg++) {
+        if (value(mask | (1 << pos), mod(acc + W[pos] * dg, 143))) { res = true; break; }
+      }
+    }
+  } else {
+    res = true;
+    for (let pos = 0; pos < 6 && res; pos++) {
+      if (mask & (1 << pos)) continue;
+      for (let dg = 1; dg <= 9; dg++) {
+        if (!value(mask | (1 << pos), mod(acc + W[pos] * dg, 143))) { res = false; break; }
+      }
+    }
+  }
+  memo.set(key, res);
+  return res;
+}
+
+let game = { digits: [null,null,null,null,null,null], by: [null,null,null,null,null,null], sel: null, role: 'andres', over: false };
+
+function maskOf() {
+  let m = 0;
+  for (let i = 0; i < 6; i++) if (game.digits[i] !== null) m |= (1 << i);
+  return m;
+}
+function accOf() {
+  let a = 0;
+  for (let i = 0; i < 6; i++) if (game.digits[i] !== null) a = mod(a + W[i] * game.digits[i], 143);
+  return a;
+}
+function filledCount() { return game.digits.filter(x => x !== null).length; }
+function isStudentTurn() {
+  if (game.over || filledCount() >= 6) return false;
+  const turn = filledCount();
+  return (turn % 2 === 0) === (game.role === 'andres');
+}
+
+/* jugada de espejo: si hay una pareja con una sola casilla llena, devolver la otra + mismo dígito */
+function mirrorMove() {
+  for (const [a, b] of PAIRS) {
+    const fa = game.digits[a] !== null, fb = game.digits[b] !== null;
+    if (fa !== fb) {
+      if (fa) return { pos: b, d: game.digits[a] };
+      return { pos: a, d: game.digits[b] };
+    }
+  }
+  return null;
+}
+/* mejor jugada por minimax para el jugador al que le toca */
+function bestMove(forAndres) {
+  const mask = maskOf(), acc = accOf();
+  const wins = [];
+  for (let pos = 0; pos < 6; pos++) {
+    if (game.digits[pos] !== null) continue;
+    for (let dg = 1; dg <= 9; dg++) {
+      const child = value(mask | (1 << pos), mod(acc + W[pos] * dg, 143));
+      if (forAndres ? child === true : child === false) wins.push({ pos, d: dg });
+    }
+  }
+  if (wins.length) return wins[Math.floor(Math.random() * wins.length)];
+  return null;
+}
+function anyMove() {
+  const empties = [];
+  for (let i = 0; i < 6; i++) if (game.digits[i] === null) empties.push(i);
+  const pos = empties[Math.floor(Math.random() * empties.length)];
+  return { pos, d: 1 + Math.floor(Math.random() * 9) };
+}
+
+function setRole(r) {
+  game.role = r;
+  document.getElementById('role-andres').classList.toggle('active', r === 'andres');
+  document.getElementById('role-blas').classList.toggle('active', r === 'blas');
+  resetGame();
+}
+function resetGame() {
+  game.digits = [null,null,null,null,null,null];
+  game.by = [null,null,null,null,null,null];
+  game.sel = null;
+  game.over = false;
+  render();
+  if (!isStudentTurn()) setTimeout(computerMove, 450);
+}
+
+function selectSlot(i) {
+  if (!isStudentTurn() || game.digits[i] !== null) return;
+  game.sel = i;
+  render();
+}
+function placeSelected(dg) {
+  if (!isStudentTurn() || game.sel === null) return;
+  const who = (filledCount() % 2 === 0) ? 'andres' : 'blas';
+  doPlace(game.sel, dg, who);
+}
+function doPlace(pos, dg, who) {
+  game.digits[pos] = dg;
+  game.by[pos] = who;
+  game.sel = null;
+  if (filledCount() === 6) { finish(); return; }
+  render();
+  if (!isStudentTurn()) setTimeout(computerMove, 500);
+}
+
+function computerMove() {
+  if (game.over || filledCount() >= 6 || isStudentTurn()) return;
+  const compIsAndres = (filledCount() % 2 === 0);
+  let move = null;
+  if (!compIsAndres) move = mirrorMove();          // Blas: estrategia de espejo
+  if (!move) move = bestMove(compIsAndres);         // si no, minimax
+  if (!move) move = anyMove();                      // posición perdida: cualquiera
+  doPlace(move.pos, move.d, compIsAndres ? 'andres' : 'blas');
+}
+
+function finish() {
+  game.over = true;
+  const num = parseInt(game.digits.join(''), 10);
+  const isMult = num % 143 === 0;
+  render();
+  const msg = document.getElementById('turn-msg');
+  if (isMult) {
+    msg.className = 'turn-msg win-blas';
+    msg.innerHTML = `${num} = 143 × ${num / 143}. ¡Múltiplo de 143! Gana <b>&nbsp;Blas</b> 🎉`;
+  } else {
+    msg.className = 'turn-msg win-andres';
+    msg.innerHTML = `${num} no es múltiplo de 143 (mód 143 = ${num % 143}). Gana <b>&nbsp;Andrés</b> 🎉`;
+  }
+}
+
+function render() {
+  const board = document.getElementById('game-board');
+  const idxRow = document.getElementById('slot-idx-row');
+  board.innerHTML = '';
+  idxRow.innerHTML = '';
+  const studentTurn = isStudentTurn();
+  for (let i = 0; i < 6; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'slot';
+    if (game.digits[i] !== null) {
+      slot.textContent = game.digits[i];
+      slot.classList.add(game.by[i]);
+    } else {
+      slot.classList.add('empty');
+      if (studentTurn) { slot.classList.add('clickable'); slot.onclick = () => selectSlot(i); }
+      if (game.sel === i) slot.classList.add('selected');
+    }
+    board.appendChild(slot);
+
+    const idx = document.createElement('div');
+    idx.className = 'slot-idx';
+    idx.textContent = SLOT_LABEL[i];
+    idxRow.appendChild(idx);
+  }
+  renderPad();
+  renderMsg();
+}
+
+const OWNERS_NAME = ['Andrés', 'Blas'];
+function renderMsg() {
+  if (game.over) return;
+  const msg = document.getElementById('turn-msg');
+  msg.className = 'turn-msg';
+  const turn = filledCount();
+  const mover = OWNERS_NAME[turn % 2];
+  if (isStudentTurn()) {
+    if (game.sel === null) msg.innerHTML = `Tu turno (${mover}). <b>&nbsp;Elegí una casilla</b> vacía.`;
+    else msg.innerHTML = `Casilla ${SLOT_LABEL[game.sel]} elegida. <b>&nbsp;Ahora elegí un dígito.</b>`;
+  } else {
+    msg.innerHTML = `Pensando… juega la compu (${mover}).`;
+  }
+}
+
+function renderPad() {
+  const pad = document.getElementById('digit-pad');
+  pad.innerHTML = '';
+  const enabled = isStudentTurn() && game.sel !== null;
+  for (let dg = 1; dg <= 9; dg++) {
+    const b = document.createElement('button');
+    b.className = 'pad-btn';
+    b.textContent = dg;
+    b.disabled = !enabled;
+    b.onclick = () => placeSelected(dg);
+    pad.appendChild(b);
+  }
+}
+
+function hint() {
+  if (!isStudentTurn()) return;
+  // limpiar resaltados previos
+  document.querySelectorAll('#game-board .slot').forEach(s => s.classList.remove('hint'));
+  document.querySelectorAll('#digit-pad .pad-btn').forEach(b => b.classList.remove('winning'));
+  const msg = document.getElementById('turn-msg');
+  const studentIsAndres = (game.role === 'andres');
+  let move = null;
+  if (!studentIsAndres) move = mirrorMove();       // Blas: mostrar el espejo
+  if (!move) move = bestMove(studentIsAndres);      // sino, cualquier jugada ganadora
+  if (!move) {
+    msg.className = 'turn-msg';
+    msg.innerHTML = `Desde acá no hay jugada que te asegure ganar contra el juego perfecto. 😅`;
+    return;
+  }
+  const slots = document.querySelectorAll('#game-board .slot');
+  slots[move.pos].classList.add('hint');
+  const btns = document.querySelectorAll('#digit-pad .pad-btn');
+  // el pad solo se habilita al elegir casilla; igual marcamos el dígito sugerido
+  if (btns[move.d - 1]) btns[move.d - 1].classList.add('winning');
+  msg.className = 'turn-msg';
+  msg.innerHTML = `Pista: poné un <b>&nbsp;${move.d}</b> en la casilla <b>&nbsp;${SLOT_LABEL[move.pos]}</b> (resaltada).`;
+}
+
+/* ---------- reveal ---------- */
+function toggleAnswer() {
+  const box = document.getElementById('answer-box');
+  const btn = document.getElementById('ans-btn');
+  const show = !box.classList.contains('show');
+  box.classList.toggle('show', show);
+  btn.classList.toggle('active', show);
+}
+
+/* ---------- init ---------- */
+updateTester();
+resetGame();
+</script>
+</body>
+</html>
