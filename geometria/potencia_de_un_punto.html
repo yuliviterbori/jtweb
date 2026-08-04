@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Potencia de un punto — Geometría 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0d2136;
+    --panel:#12314a;
+    --panel-2:#0e2a40;
+    --line:#25445e;
+    --line-soft:#1c3a52;
+    --chalk:#f4efe3;
+    --chalk-dim:#8fa8bb;
+    --brass:#dba53c;
+    --brass-soft:#b6832e;
+    --rust:#cf6b52;
+    --teal:#4fada0;
+    --good:#84b06b;
+    --bad:#cf6b6b;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 32px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 32px);
+    color:var(--chalk);
+    font-family:'Inter',system-ui,sans-serif;
+    min-height:100vh;
+    padding:20px 16px 60px;
+  }
+  ::selection{background:var(--brass);color:var(--ink);}
+  a{color:var(--brass);}
+
+  .wrap{max-width:1180px;margin:0 auto;}
+
+  .back-home{
+    display:inline-flex;align-items:center;gap:6px;
+    color:var(--chalk-dim);text-decoration:none;
+    font-size:13px;font-weight:500;margin-bottom:16px;
+    transition:color .15s;
+  }
+  .back-home:hover{color:var(--brass);}
+
+  header.top{display:flex;align-items:center;gap:16px;margin-bottom:6px;flex-wrap:wrap;}
+  .compass-mark{flex:0 0 auto;width:46px;height:46px;}
+  .titles{flex:1 1 auto;min-width:220px;}
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(22px,3.4vw,32px);
+    font-weight:700;
+    margin:0 0 2px;
+    letter-spacing:-0.01em;
+  }
+  .subtitle{color:var(--chalk-dim);font-size:13.5px;margin:0;}
+  .badge{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.04em;
+    color:var(--ink);
+    background:var(--brass);
+    padding:5px 10px;
+    border-radius:999px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+
+  details.howto{
+    margin:14px 0 22px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:2px 14px;
+  }
+  details.howto summary{
+    cursor:pointer;
+    padding:9px 0;
+    font-size:13px;
+    color:var(--chalk-dim);
+    font-weight:500;
+  }
+  details.howto p{margin:0 0 12px;font-size:13.5px;color:var(--chalk);line-height:1.5;}
+  details.howto strong{color:var(--brass);}
+
+  nav.tabs{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding-bottom:8px;
+    margin-bottom:18px;
+    -webkit-overflow-scrolling:touch;
+  }
+  nav.tabs::-webkit-scrollbar{height:6px;}
+  nav.tabs::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
+  .tab-btn{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    color:var(--chalk-dim);
+    padding:9px 14px 9px 10px;
+    border-radius:999px;
+    font-size:13px;
+    font-family:'Inter',sans-serif;
+    font-weight:500;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:background .15s,color .15s,border-color .15s;
+  }
+  .tab-btn .num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    background:rgba(255,255,255,0.08);
+    color:var(--chalk-dim);
+    padding:2px 6px;
+    border-radius:6px;
+  }
+  .tab-btn.active{background:var(--brass);border-color:var(--brass);color:var(--ink);}
+  .tab-btn.active .num{background:rgba(13,33,54,0.25);color:var(--ink);}
+  .tab-btn:hover:not(.active){border-color:var(--brass-soft);color:var(--chalk);}
+  .tab-btn:focus-visible{outline:2px solid var(--brass);outline-offset:2px;}
+
+  .panel{display:none;}
+  .panel.active{display:block;animation:fadein .2s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .stage{display:grid;grid-template-columns:1.25fr 1fr;gap:20px;align-items:start;}
+  @media (max-width:880px){.stage{grid-template-columns:1fr;}}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+  }
+  .diagram-card svg{width:100%;height:auto;display:block;touch-action:none;}
+  .ring{fill:var(--panel-2);stroke:var(--line-soft);stroke-width:2;}
+  .stroke-dim{stroke:var(--chalk-dim);}
+  .fill-dim{fill:var(--chalk-dim);}
+  .stroke-chalk{stroke:var(--chalk);}
+  .fill-chalk{fill:var(--chalk);}
+  .stroke-brass{stroke:var(--brass);}
+  .fill-brass{fill:var(--brass);}
+  .stroke-rust{stroke:var(--rust);}
+  .fill-rust{fill:var(--rust);}
+  .stroke-teal{stroke:var(--teal);}
+  .fill-teal{fill:var(--teal);}
+  svg text{font-family:'JetBrains Mono',monospace;font-size:13px;fill:var(--chalk);user-select:none;}
+  .lbl-dim{fill:var(--chalk-dim)!important;font-size:11.5px;}
+  .lbl-big{font-size:16px;font-weight:600;}
+
+  .handle-hit{fill:transparent;cursor:grab;}
+  .handle-hit:active{cursor:grabbing;}
+  [data-handle]{touch-action:none;}
+  [data-handle]:hover .handle-dot{r:9.5;}
+  [data-handle]:focus-visible .handle-dot{stroke:var(--chalk);stroke-width:2;}
+  .handle-dot{r:8;fill:var(--brass);stroke:var(--ink);stroke-width:2;transition:r .1s;}
+  .handle-cross{stroke:var(--ink);stroke-width:1.4;}
+
+  .info-title{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:600;margin:0 0 8px;}
+  .info-text{font-size:13.5px;line-height:1.55;color:var(--chalk-dim);margin:0 0 14px;}
+  .info-text strong{color:var(--chalk);font-weight:600;}
+
+  .gauge{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 14px;
+    margin-bottom:14px;
+    box-shadow:inset 0 1px 6px rgba(0,0,0,0.25);
+  }
+  .gauge-row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;font-size:13px;}
+  .gauge-row + .gauge-row{border-top:1px dashed var(--line-soft);}
+  .gauge-row span{color:var(--chalk-dim);}
+  .gauge-row strong{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--brass);font-weight:600;}
+  .gauge-row strong.match{color:var(--good);}
+  .formula{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    text-align:center;
+    color:var(--chalk);
+    background:rgba(219,165,60,0.08);
+    border:1px dashed var(--brass-soft);
+    border-radius:8px;
+    padding:8px 6px;
+    margin-bottom:14px;
+  }
+
+  .pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+  .pill{
+    font-family:'Inter',sans-serif;
+    font-size:12.5px;
+    font-weight:500;
+    padding:6px 12px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--chalk-dim);
+    cursor:pointer;
+    transition:all .15s;
+  }
+  .pill.active{background:var(--brass);border-color:var(--brass);color:var(--ink);}
+  .pill:hover:not(.active){border-color:var(--brass-soft);color:var(--chalk);}
+  .pill:focus-visible{outline:2px solid var(--brass);outline-offset:2px;}
+
+  .reset-btn{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:'Inter',sans-serif;font-size:12.5px;font-weight:500;
+    color:var(--chalk-dim);background:transparent;border:1px solid var(--line);
+    border-radius:8px;padding:7px 12px;cursor:pointer;transition:all .15s;
+  }
+  .reset-btn:hover{border-color:var(--rust);color:var(--chalk);}
+  .reset-btn:focus-visible{outline:2px solid var(--brass);outline-offset:2px;}
+
+  /* listas de contenido / problemas */
+  .subhead{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--brass);margin:18px 0 10px;}
+  .subhead:first-child{margin-top:0;}
+  .problem{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:10px;
+    padding:12px 15px;margin-bottom:10px;font-size:13.5px;line-height:1.6;color:var(--chalk);
+    display:flex;gap:10px;
+  }
+  .problem .pn{font-family:'JetBrains Mono',monospace;color:var(--brass);font-weight:600;flex:0 0 auto;}
+  .problem .mono{font-family:'JetBrains Mono',monospace;color:var(--chalk);}
+
+  .quiz-q{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px;}
+  .quiz-q p{margin:0 0 10px;font-size:14px;font-weight:500;}
+  .quiz-opts{display:flex;flex-direction:column;gap:7px;}
+  .quiz-opt{
+    text-align:left;font-family:'Inter',sans-serif;font-size:13.5px;
+    background:var(--panel);border:1px solid var(--line);color:var(--chalk);
+    border-radius:8px;padding:9px 12px;cursor:pointer;transition:all .15s;
+  }
+  .quiz-opt:hover{border-color:var(--brass-soft);}
+  .quiz-opt.correct{background:rgba(132,176,107,0.18);border-color:var(--good);color:var(--good);}
+  .quiz-opt.wrong{background:rgba(207,107,107,0.18);border-color:var(--bad);color:var(--bad);}
+  .quiz-opt:disabled{cursor:default;}
+  .quiz-score{
+    font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--brass);
+    text-align:center;padding:10px;background:var(--panel-2);border-radius:8px;border:1px dashed var(--brass-soft);
+  }
+
+  footer{text-align:center;color:var(--chalk-dim);font-size:12px;margin-top:36px;}
+
+  @media (prefers-reduced-motion:reduce){
+    .panel.active{animation:none;}
+    *{transition:none!important;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a href="../index.html" class="back-home">← Volver al inicio</a>
+
+  <header class="top">
+    <svg class="compass-mark" viewBox="0 0 46 46" fill="none">
+      <circle cx="23" cy="23" r="20" stroke="#dba53c" stroke-width="2"/>
+      <line x1="23" y1="4" x2="23" y2="10" stroke="#dba53c" stroke-width="2"/>
+      <line x1="23" y1="36" x2="23" y2="42" stroke="#dba53c" stroke-width="2"/>
+      <line x1="4" y1="23" x2="10" y2="23" stroke="#dba53c" stroke-width="2"/>
+      <line x1="36" y1="23" x2="42" y2="23" stroke="#dba53c" stroke-width="2"/>
+      <circle cx="23" cy="23" r="3" fill="#dba53c"/>
+      <line x1="23" y1="23" x2="34" y2="14" stroke="#f4efe3" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <div class="titles">
+      <h1>Potencia de un punto</h1>
+      <p class="subtitle">Laboratorio de Matemática · Jóvenes Talentos · Geometría 2</p>
+    </div>
+    <span class="badge">CAP. 3 · POTENCIA DE UN PUNTO</span>
+  </header>
+
+  <details class="howto">
+    <summary>Cómo usar esta clase interactiva ▾</summary>
+    <p>Arrastrá los <strong>puntos dorados</strong> con el mouse o el dedo. En cada sección vas a ver que un cierto producto de segmentos se mantiene <strong>constante</strong>: esa constante es la <strong>potencia</strong> del punto. Los valores se actualizan en vivo. Cada sección tiene su botón <strong>Reiniciar</strong>. Navegá con las pestañas de arriba, en el orden del capítulo.</p>
+  </details>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab-btn active" data-panel="p0"><span class="num">01</span>Potencia interna</button>
+    <button class="tab-btn" data-panel="p1"><span class="num">02</span>Potencia externa</button>
+    <button class="tab-btn" data-panel="p2"><span class="num">03</span>Secante y tangente</button>
+    <button class="tab-btn" data-panel="p3"><span class="num">04</span>Potencia y el centro</button>
+    <button class="tab-btn" data-panel="p4"><span class="num">05</span>Eje radical</button>
+    <button class="tab-btn" data-panel="p5"><span class="num">06</span>Propiedades</button>
+    <button class="tab-btn" data-panel="p6"><span class="num">07</span>Problemas</button>
+    <button class="tab-btn" data-panel="p7"><span class="num">08</span>Reto rápido</button>
+  </nav>
+
+  <!-- ===================== SECTION 0 · Potencia interna ===================== -->
+  <section class="panel active" id="p0">
+    <div class="stage">
+      <div class="card diagram-card"><svg id="s0-svg" viewBox="0 0 560 560"></svg></div>
+      <div class="card">
+        <h2 class="info-title">Potencia interna</h2>
+        <p class="info-text">Cuando P está <strong>dentro</strong> de la circunferencia, cada cuerda que pasa por P queda dividida en dos segmentos. El <strong>producto de esos segmentos es el mismo para cualquier cuerda</strong>. Arrastrá P y los extremos A y C de las dos cuerdas: <span class="mono">AP·BP</span> y <span class="mono">CP·DP</span> se mantienen iguales.</p>
+        <div class="formula">AP · BP = CP · DP = R² − PO²</div>
+        <div class="gauge">
+          <div class="gauge-row"><span>AP · BP</span><strong id="s0-ab">—</strong></div>
+          <div class="gauge-row"><span>CP · DP</span><strong id="s0-cd">—</strong></div>
+          <div class="gauge-row"><span>Diferencia</span><strong id="s0-diff">—</strong></div>
+        </div>
+        <p class="info-text" style="margin-bottom:0;">Como A, B, C y D quedan sobre la circunferencia, forman un cuadrilátero cíclico. De hecho, esta igualdad es un <strong>si y sólo si</strong>: caracteriza a los cuadriláteros cíclicos.</p>
+      </div>
+    </div>
+    <div style="max-width:820px;margin:8px auto 0;"><button class="reset-btn" id="s0-reset">↺ Reiniciar</button></div>
+  </section>
+
+  <!-- ===================== SECTION 1 · Potencia externa ===================== -->
+  <section class="panel" id="p1">
+    <div class="stage">
+      <div class="card diagram-card"><svg id="s1-svg" viewBox="0 0 560 560"></svg></div>
+      <div class="card">
+        <h2 class="info-title">Potencia externa</h2>
+        <p class="info-text">Cuando P está <strong>fuera</strong> de la circunferencia, cada secante que pasa por P la corta en dos puntos. El <strong>producto de las distancias de P a esos dos puntos es el mismo para cualquier secante</strong>. Arrastrá P y los puntos A y C sobre la circunferencia.</p>
+        <div class="formula">PA · PB = PC · PD = PO² − R²</div>
+        <div class="gauge">
+          <div class="gauge-row"><span>PA · PB</span><strong id="s1-ab">—</strong></div>
+          <div class="gauge-row"><span>PC · PD</span><strong id="s1-cd">—</strong></div>
+          <div class="gauge-row"><span>Diferencia</span><strong id="s1-diff">—</strong></div>
+        </div>
+        <button class="reset-btn" id="s1-reset">↺ Reiniciar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 2 · Secante y tangente ===================== -->
+  <section class="panel" id="p2">
+    <div class="stage">
+      <div class="card diagram-card"><svg id="s2-svg" viewBox="0 0 560 560"></svg></div>
+      <div class="card">
+        <h2 class="info-title">Secante y tangente</h2>
+        <p class="info-text">Desde un punto exterior P trazamos una <strong>secante</strong> (corta en A y B) y una <strong>tangente</strong> (toca en M). El cuadrado de la tangente es igual al producto de la secante: es el caso límite en que los dos puntos de corte se juntan en M.</p>
+        <div class="formula">PM² = PA · PB</div>
+        <div class="gauge">
+          <div class="gauge-row"><span>PM²</span><strong id="s2-pm">—</strong></div>
+          <div class="gauge-row"><span>PA · PB</span><strong id="s2-ab">—</strong></div>
+          <div class="gauge-row"><span>Diferencia</span><strong id="s2-diff">—</strong></div>
+        </div>
+        <button class="reset-btn" id="s2-reset">↺ Reiniciar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 3 · Potencia y el centro ===================== -->
+  <section class="panel" id="p3">
+    <div class="stage">
+      <div class="card diagram-card"><svg id="s3-svg" viewBox="0 0 560 560"></svg></div>
+      <div class="card">
+        <h2 class="info-title">Potencia y el centro</h2>
+        <p class="info-text">La potencia depende <strong>sólo</strong> de la distancia de P al centro O y del radio R. Arrastrá P a cualquier lado: <span class="mono">R² − PO²</span> es positivo si P es interior, negativo si es exterior, y cero justo sobre la circunferencia (donde la línea de puntos por P y O corta en G₁ y G₂).</p>
+        <div class="formula">interna: R² − PO²&nbsp;&nbsp;·&nbsp;&nbsp;externa: PO² − R²</div>
+        <div class="gauge">
+          <div class="gauge-row"><span>Radio R</span><strong id="s3-r">—</strong></div>
+          <div class="gauge-row"><span>Distancia P–O</span><strong id="s3-po">—</strong></div>
+          <div class="gauge-row"><span>PG₁ · PG₂</span><strong id="s3-prod">—</strong></div>
+          <div class="gauge-row"><span>R² − PO²</span><strong id="s3-pow">—</strong></div>
+          <div class="gauge-row"><span>Posición de P</span><strong id="s3-loc">—</strong></div>
+        </div>
+        <button class="reset-btn" id="s3-reset">↺ Reiniciar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 4 · Eje radical ===================== -->
+  <section class="panel" id="p4">
+    <div class="stage">
+      <div class="card diagram-card"><svg id="s4-svg" viewBox="0 0 560 560"></svg></div>
+      <div class="card">
+        <h2 class="info-title">Eje radical</h2>
+        <p class="info-text">El <strong>eje radical</strong> de dos circunferencias es el lugar de los puntos que tienen <strong>la misma potencia respecto a ambas</strong>. Siempre es una <strong>recta perpendicular a la línea de los centros</strong>. Movés los centros O₁, O₂ y los radios; arrastrá el punto <strong>Q</strong> hasta el eje (línea dorada) y mirá cómo se igualan las potencias.</p>
+        <div class="gauge">
+          <div class="gauge-row"><span>Potencia de Q resp. C₁</span><strong id="s4-p1">—</strong></div>
+          <div class="gauge-row"><span>Potencia de Q resp. C₂</span><strong id="s4-p2">—</strong></div>
+          <div class="gauge-row"><span>Diferencia</span><strong id="s4-diff">—</strong></div>
+        </div>
+        <p class="info-text" style="margin-bottom:0;">Si las circunferencias se cortan, el eje pasa por los dos puntos de intersección; si son tangentes, por el punto de contacto.</p>
+        <button class="reset-btn" id="s4-reset" style="margin-top:14px;">↺ Reiniciar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 5 · Propiedades ===================== -->
+  <section class="panel" id="p5">
+    <div class="card" style="max-width:760px;margin:0 auto;">
+      <h2 class="info-title">Propiedades y casos</h2>
+
+      <div class="subhead">Eje radical — casos a analizar</div>
+      <div id="cases-list"></div>
+
+      <div class="subhead">Propiedades para demostrar</div>
+      <div id="props-list"></div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 6 · Problemas ===================== -->
+  <section class="panel" id="p6">
+    <div class="card" style="max-width:760px;margin:0 auto;">
+      <h2 class="info-title">Problemas relacionados</h2>
+      <p class="info-text">Seis problemas para practicar la potencia de un punto y los ejes radicales.</p>
+      <div id="prob-list"></div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 7 · Reto rápido ===================== -->
+  <section class="panel" id="p7">
+    <div class="card" style="max-width:640px;margin:0 auto;">
+      <h2 class="info-title">Reto rápido</h2>
+      <p class="info-text">Cinco preguntas para cerrar la clase. Tocá una opción para responder.</p>
+      <div id="quiz-list"></div>
+      <div class="quiz-score" id="quiz-score">Puntaje: 0 / 5</div>
+      <div style="text-align:center;margin-top:12px;">
+        <button class="reset-btn" id="quiz-reset">↺ Reintentar</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>OMAPA · Laboratorio de Matemática — hecho para compartir en clase virtual</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const CX=280, CY=280, R=150;
+
+  /* ---------- utilidades geométricas ---------- */
+  const toRad=d=>d*Math.PI/180, toDeg=r=>r*180/Math.PI, mod360=a=>((a%360)+360)%360;
+  const ptOnCircle=(cx,cy,r,t)=>({x:cx+r*Math.cos(toRad(t)), y:cy+r*Math.sin(toRad(t))});
+  const pc=t=>ptOnCircle(CX,CY,R,t);
+  const angleOfPoint=(cx,cy,x,y)=>mod360(toDeg(Math.atan2(y-cy,x-cx)));
+  const dist=(p,q)=>Math.hypot(p.x-q.x,p.y-q.y);
+  const nf=n=>Math.round(n).toLocaleString('es');
+
+  // segunda intersección de la recta P–A con la circunferencia (A ya está sobre ella)
+  function chordOther(P,A){
+    const d={x:A.x-P.x,y:A.y-P.y};
+    const f={x:P.x-CX,y:P.y-CY};
+    const a=d.x*d.x+d.y*d.y;
+    if(a<1e-6) return A;
+    const b=2*(d.x*f.x+d.y*f.y), c=f.x*f.x+f.y*f.y-R*R;
+    const disc=b*b-4*a*c; if(disc<0) return A;
+    const sq=Math.sqrt(disc), s1=(-b+sq)/(2*a), s2=(-b-sq)/(2*a);
+    const so=Math.abs(s1-1)<Math.abs(s2-1)? s2 : s1;
+    return {x:P.x+so*d.x, y:P.y+so*d.y};
+  }
+  function tangentPoints(P){
+    const dO=dist(P,{x:CX,y:CY});
+    const phi=angleOfPoint(CX,CY,P.x,P.y);
+    const alpha=toDeg(Math.acos(Math.min(1,R/dO)));
+    return {t1:mod360(phi-alpha), t2:mod360(phi+alpha)};
+  }
+  function clampInside(p){
+    const dx=p.x-CX,dy=p.y-CY,d=Math.hypot(dx,dy),mx=R-30;
+    if(d>mx){ const a=Math.atan2(dy,dx); return {x:CX+Math.cos(a)*mx,y:CY+Math.sin(a)*mx}; }
+    return {x:p.x,y:p.y};
+  }
+  function clampOutside(p){
+    const dx=p.x-CX,dy=p.y-CY,d=Math.hypot(dx,dy),mn=R+28,mxr=248,a=Math.atan2(dy,dx);
+    if(d<mn) return {x:CX+Math.cos(a)*mn,y:CY+Math.sin(a)*mn};
+    if(d>mxr) return {x:CX+Math.cos(a)*mxr,y:CY+Math.sin(a)*mxr};
+    return {x:p.x,y:p.y};
+  }
+  function clampBox(p,lo,hi){ return {x:Math.max(lo,Math.min(hi,p.x)), y:Math.max(lo,Math.min(hi,p.y))}; }
+
+  function protractorTicks(){
+    let s='';
+    for(let a=0;a<360;a+=30){
+      const long=(a%90===0);
+      const p1=pc(a), p2=ptOnCircle(CX,CY,R+(long?15:9),a);
+      const p1b=ptOnCircle(CX,CY,R+4,a);
+      s+=`<line x1="${p1b.x.toFixed(1)}" y1="${p1b.y.toFixed(1)}" x2="${p2.x.toFixed(1)}" y2="${p2.y.toFixed(1)}" class="stroke-dim" stroke-width="${long?2:1}" opacity="${long?0.5:0.28}"/>`;
+    }
+    return s;
+  }
+  function baseSvg(){
+    return `<circle cx="${CX}" cy="${CY}" r="${R}" class="ring"/>${protractorTicks()}<circle cx="${CX}" cy="${CY}" r="3" class="fill-dim"/><text x="${CX-16}" y="${CY+4}" class="lbl-dim">O</text>`;
+  }
+  function segLine(p,q,cls,w,dash){
+    return `<line x1="${p.x.toFixed(1)}" y1="${p.y.toFixed(1)}" x2="${q.x.toFixed(1)}" y2="${q.y.toFixed(1)}" class="${cls}" stroke-width="${w||2}"${dash?` stroke-dasharray="${dash}"`:''}/>`;
+  }
+  function dot(p,label,cls,dx,dy){
+    return `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" class="${cls}"/>`+
+      (label?`<text x="${(p.x+(dx===undefined?8:dx)).toFixed(1)}" y="${(p.y+(dy===undefined?-8:dy)).toFixed(1)}" class="${cls}">${label}</text>`:'');
+  }
+  function handle(id,p,label,labelDx,labelDy){
+    labelDx = labelDx===undefined? 14 : labelDx;
+    labelDy = labelDy===undefined? -14 : labelDy;
+    return `<g data-handle="${id}" tabindex="0" aria-label="Punto ${label}">
+      <circle class="handle-hit" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="22"/>
+      <line class="handle-cross" x1="${(p.x-6).toFixed(2)}" y1="${p.y.toFixed(2)}" x2="${(p.x+6).toFixed(2)}" y2="${p.y.toFixed(2)}"/>
+      <line class="handle-cross" x1="${p.x.toFixed(2)}" y1="${(p.y-6).toFixed(2)}" x2="${p.x.toFixed(2)}" y2="${(p.y+6).toFixed(2)}"/>
+      <circle class="handle-dot" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}"/>
+      <text x="${(p.x+labelDx).toFixed(2)}" y="${(p.y+labelDy).toFixed(2)}" class="lbl-big fill-brass">${label}</text>
+    </g>`;
+  }
+  function svgPointFromEvent(svg, evt){
+    const pt = svg.createSVGPoint();
+    pt.x = evt.clientX; pt.y = evt.clientY;
+    return pt.matrixTransform(svg.getScreenCTM().inverse());
+  }
+  function wireDrag(svg, onMove){
+    let active=null;
+    svg.addEventListener('pointerdown', e=>{
+      const g=e.target.closest('[data-handle]'); if(!g) return;
+      e.preventDefault(); active=g.dataset.handle;
+    });
+    document.addEventListener('pointermove', e=>{
+      if(!active) return;
+      onMove(active, svgPointFromEvent(svg,e));
+    });
+    document.addEventListener('pointerup', ()=>{ active=null; });
+    document.addEventListener('pointercancel', ()=>{ active=null; });
+    svg.addEventListener('keydown', e=>{
+      const g=e.target.closest('[data-handle]'); if(!g) return;
+      const kx=(e.key==='ArrowLeft'?-3:e.key==='ArrowRight'?3:0);
+      const ky=(e.key==='ArrowUp'?-3:e.key==='ArrowDown'?3:0);
+      if(kx===0&&ky===0) return;
+      e.preventDefault();
+      onMove(g.dataset.handle, null, {kx,ky});
+    });
+  }
+
+  /* =========================================================
+     SECTION 0 — Potencia interna
+  ========================================================= */
+  (function(){
+    const svg=document.getElementById('s0-svg');
+    const DEF={P:{x:305,y:300}, tA:150, tC:40};
+    let st=JSON.parse(JSON.stringify(DEF));
+    function render(){
+      const P=st.P, A=pc(st.tA), C=pc(st.tC), B=chordOther(P,A), D=chordOther(P,C);
+      let s=baseSvg();
+      s+=segLine(A,B,'stroke-brass',2.5);
+      s+=segLine(C,D,'stroke-teal',2.5);
+      s+=dot(B,'B','fill-brass'); s+=dot(D,'D','fill-teal');
+      s+=dot(P,'P','fill-chalk',10,-8);
+      s+=handle('P',P,'',0,0); s+=handle('A',A,'A'); s+=handle('C',C,'C');
+      svg.innerHTML=s;
+      const ab=dist(A,P)*dist(B,P), cd=dist(C,P)*dist(D,P);
+      document.getElementById('s0-ab').textContent=nf(ab);
+      document.getElementById('s0-cd').textContent=nf(cd);
+      const df=document.getElementById('s0-diff'); df.textContent=nf(Math.abs(ab-cd));
+      df.classList.toggle('match', Math.abs(ab-cd)<Math.max(2,0.005*ab));
+    }
+    wireDrag(svg,(id,p,k)=>{
+      if(id==='P'){ st.P = p? clampInside(p) : clampInside({x:st.P.x+k.kx,y:st.P.y+k.ky}); }
+      else if(id==='A'){ st.tA = p? angleOfPoint(CX,CY,p.x,p.y) : st.tA; }
+      else if(id==='C'){ st.tC = p? angleOfPoint(CX,CY,p.x,p.y) : st.tC; }
+      render();
+    });
+    document.getElementById('s0-reset').addEventListener('click',()=>{ st=JSON.parse(JSON.stringify(DEF)); render(); });
+    render();
+  })();
+
+  /* =========================================================
+     SECTION 1 — Potencia externa
+  ========================================================= */
+  (function(){
+    const svg=document.getElementById('s1-svg');
+    const DEF={P:{x:48,y:250}, tA:35, tC:325};
+    let st=JSON.parse(JSON.stringify(DEF));
+    function render(){
+      const P=st.P, A=pc(st.tA), B=chordOther(P,A), C=pc(st.tC), D=chordOther(P,C);
+      const farAB = dist(P,A)>dist(P,B)? A:B;
+      const farCD = dist(P,C)>dist(P,D)? C:D;
+      let s=baseSvg();
+      s+=segLine(P,farAB,'stroke-brass',2.5);
+      s+=segLine(P,farCD,'stroke-teal',2.5);
+      s+=dot(A,'A','fill-brass'); s+=dot(B,'B','fill-brass',8,14);
+      s+=dot(C,'C','fill-teal'); s+=dot(D,'D','fill-teal',8,14);
+      s+=dot(P,'P','fill-chalk',-16,-8);
+      s+=handle('P',P,'',0,0); s+=handle('A',A,'A'); s+=handle('C',C,'C');
+      svg.innerHTML=s;
+      const ab=dist(P,A)*dist(P,B), cd=dist(P,C)*dist(P,D);
+      document.getElementById('s1-ab').textContent=nf(ab);
+      document.getElementById('s1-cd').textContent=nf(cd);
+      const df=document.getElementById('s1-diff'); df.textContent=nf(Math.abs(ab-cd));
+      df.classList.toggle('match', Math.abs(ab-cd)<Math.max(2,0.005*ab));
+    }
+    wireDrag(svg,(id,p,k)=>{
+      if(id==='P'){ st.P = p? clampOutside(p) : clampOutside({x:st.P.x+k.kx,y:st.P.y+k.ky}); }
+      else if(id==='A'){ st.tA = p? angleOfPoint(CX,CY,p.x,p.y) : st.tA; }
+      else if(id==='C'){ st.tC = p? angleOfPoint(CX,CY,p.x,p.y) : st.tC; }
+      render();
+    });
+    document.getElementById('s1-reset').addEventListener('click',()=>{ st=JSON.parse(JSON.stringify(DEF)); render(); });
+    render();
+  })();
+
+  /* =========================================================
+     SECTION 2 — Secante y tangente
+  ========================================================= */
+  (function(){
+    const svg=document.getElementById('s2-svg');
+    const DEF={P:{x:490,y:300}, tA:200};
+    let st=JSON.parse(JSON.stringify(DEF));
+    function render(){
+      const P=st.P, A=pc(st.tA), B=chordOther(P,A);
+      const tp=tangentPoints(P);
+      // elegir la tangente más "de arriba" para que no se superponga con la secante
+      const M1=pc(tp.t1), M2=pc(tp.t2);
+      const M = (dist(M1,A)>=dist(M2,A))? M1 : M2;
+      const farAB = dist(P,A)>dist(P,B)? A:B;
+      let s=baseSvg();
+      s+=segLine(P,farAB,'stroke-brass',2.5);
+      // tangente, un poco extendida más allá de M
+      const dx=M.x-P.x,dy=M.y-P.y,l=Math.hypot(dx,dy)||1;
+      const Mext={x:M.x+dx/l*40,y:M.y+dy/l*40};
+      s+=segLine(P,Mext,'stroke-teal',2.5);
+      s+=segLine(M,{x:CX,y:CY},'stroke-dim',1.2,'4 3');
+      s+=dot(A,'A','fill-brass'); s+=dot(B,'B','fill-brass',8,14);
+      s+=dot(M,'M','fill-teal');
+      s+=dot(P,'P','fill-chalk',10,-8);
+      s+=handle('P',P,'',0,0); s+=handle('A',A,'A');
+      svg.innerHTML=s;
+      const pm=dist(P,M)*dist(P,M), ab=dist(P,A)*dist(P,B);
+      document.getElementById('s2-pm').textContent=nf(pm);
+      document.getElementById('s2-ab').textContent=nf(ab);
+      const df=document.getElementById('s2-diff'); df.textContent=nf(Math.abs(pm-ab));
+      df.classList.toggle('match', Math.abs(pm-ab)<Math.max(2,0.005*ab));
+    }
+    wireDrag(svg,(id,p,k)=>{
+      if(id==='P'){ st.P = p? clampOutside(p) : clampOutside({x:st.P.x+k.kx,y:st.P.y+k.ky}); }
+      else if(id==='A'){ st.tA = p? angleOfPoint(CX,CY,p.x,p.y) : st.tA; }
+      render();
+    });
+    document.getElementById('s2-reset').addEventListener('click',()=>{ st=JSON.parse(JSON.stringify(DEF)); render(); });
+    render();
+  })();
+
+  /* =========================================================
+     SECTION 3 — Potencia y el centro
+  ========================================================= */
+  (function(){
+    const svg=document.getElementById('s3-svg');
+    const DEF={P:{x:350,y:225}};
+    let st=JSON.parse(JSON.stringify(DEF));
+    function render(){
+      const P=st.P, O={x:CX,y:CY};
+      const PO=dist(P,O);
+      let u = PO<1? {x:1,y:0} : {x:(O.x-P.x)/PO,y:(O.y-P.y)/PO};
+      const G1={x:CX+u.x*R,y:CY+u.y*R}, G2={x:CX-u.x*R,y:CY-u.y*R};
+      let s=baseSvg();
+      s+=segLine(G1,G2,'stroke-chalk',1.6,'6 5');
+      s+=segLine(P,O,'stroke-teal',2);
+      s+=dot(G1,'G₁','fill-dim',6,-6); s+=dot(G2,'G₂','fill-dim',6,14);
+      s+=dot(P,'P','fill-chalk',10,-8);
+      s+=handle('P',P,'',0,0);
+      svg.innerHTML=s;
+      const pow=R*R-PO*PO;
+      const prod=dist(P,G1)*dist(P,G2);
+      document.getElementById('s3-r').textContent=nf(R);
+      document.getElementById('s3-po').textContent=nf(PO);
+      document.getElementById('s3-prod').textContent=nf(prod);
+      const pe=document.getElementById('s3-pow'); pe.textContent=nf(pow);
+      pe.style.color = pow>3? 'var(--teal)' : (pow<-3? 'var(--rust)' : 'var(--brass)');
+      const loc=document.getElementById('s3-loc');
+      loc.textContent = pow>3? 'interior' : (pow<-3? 'exterior' : 'sobre la circunf.');
+      loc.style.color = pe.style.color;
+    }
+    wireDrag(svg,(id,p,k)=>{
+      st.P = p? clampBox(p,20,540) : clampBox({x:st.P.x+k.kx,y:st.P.y+k.ky},20,540);
+      render();
+    });
+    document.getElementById('s3-reset').addEventListener('click',()=>{ st=JSON.parse(JSON.stringify(DEF)); render(); });
+    render();
+  })();
+
+  /* =========================================================
+     SECTION 4 — Eje radical
+  ========================================================= */
+  (function(){
+    const svg=document.getElementById('s4-svg');
+    const DEF={O1:{x:215,y:295}, r1:105, O2:{x:385,y:265}, r2:78, Q:{x:300,y:150}};
+    let st=JSON.parse(JSON.stringify(DEF));
+    function circle(o,r,cls){ return `<circle cx="${o.x.toFixed(1)}" cy="${o.y.toFixed(1)}" r="${r.toFixed(1)}" fill="none" class="${cls}" stroke-width="2" opacity="0.9"/>`; }
+    function render(){
+      const {O1,O2,r1,r2,Q}=st;
+      let s=`<circle cx="${CX}" cy="${CY}" r="0" fill="none"/>`;
+      s=`<rect x="0" y="0" width="560" height="560" fill="none"/>`;
+      s+=circle(O1,r1,'stroke-brass');
+      s+=circle(O2,r2,'stroke-teal');
+      // eje radical
+      const d=dist(O1,O2);
+      if(d>1){
+        const a=(d*d+r1*r1-r2*r2)/(2*d);
+        const u={x:(O2.x-O1.x)/d,y:(O2.y-O1.y)/d};
+        const foot={x:O1.x+a*u.x,y:O1.y+a*u.y};
+        const perp={x:-u.y,y:u.x}, LEN=360;
+        const e1={x:foot.x+perp.x*LEN,y:foot.y+perp.y*LEN};
+        const e2={x:foot.x-perp.x*LEN,y:foot.y-perp.y*LEN};
+        s+=segLine(e2,e1,'stroke-brass',2,'7 5');
+        s+=segLine(O1,O2,'stroke-dim',1.2,'3 4');
+      }
+      s+=dot(O1,'O₁','fill-brass',-6,-10); s+=dot(O2,'O₂','fill-teal',6,-10);
+      s+=dot(Q,'Q','fill-chalk',10,-8);
+      // handles: centros, radios (al este de cada centro) y Q
+      s+=handle('O1',O1,'',0,0);
+      s+=handle('O2',O2,'',0,0);
+      s+=handle('R1',{x:O1.x+r1,y:O1.y},'r₁',6,-8);
+      s+=handle('R2',{x:O2.x+r2,y:O2.y},'r₂',6,-8);
+      s+=handle('Q',Q,'',0,0);
+      svg.innerHTML=s;
+      const p1=dist(Q,O1)**2-r1*r1, p2=dist(Q,O2)**2-r2*r2;
+      document.getElementById('s4-p1').textContent=nf(p1);
+      document.getElementById('s4-p2').textContent=nf(p2);
+      const df=document.getElementById('s4-diff'); df.textContent=nf(Math.abs(p1-p2));
+      df.classList.toggle('match', Math.abs(p1-p2) < 3*2*Math.max(20,d));
+    }
+    wireDrag(svg,(id,p,k)=>{
+      const mv=(cur)=> p? p : {x:cur.x+k.kx,y:cur.y+k.ky};
+      if(id==='O1'){ st.O1=clampBox(mv(st.O1),40,520); }
+      else if(id==='O2'){ st.O2=clampBox(mv(st.O2),40,520); }
+      else if(id==='R1'){ const q=mv({x:st.O1.x+st.r1,y:st.O1.y}); st.r1=Math.max(25,Math.min(190,dist(q,st.O1))); }
+      else if(id==='R2'){ const q=mv({x:st.O2.x+st.r2,y:st.O2.y}); st.r2=Math.max(25,Math.min(190,dist(q,st.O2))); }
+      else if(id==='Q'){ st.Q=clampBox(mv(st.Q),20,540); }
+      render();
+    });
+    document.getElementById('s4-reset').addEventListener('click',()=>{ st=JSON.parse(JSON.stringify(DEF)); render(); });
+    render();
+  })();
+
+  /* =========================================================
+     SECTION 5 — Propiedades y casos (estático)
+  ========================================================= */
+  (function(){
+    const CASES=[
+      'Dos circunferencias que no se tocan ni se contienen.',
+      'Dos circunferencias tangentes externamente.',
+      'Dos circunferencias que se intersecan en dos puntos.',
+      'Dos circunferencias tangentes internamente.',
+      'Dos circunferencias que no se tocan, una contenida dentro de la otra.'
+    ];
+    const PROPS=[
+      'Para una secante y una tangente desde P (que cortan/tocan en A, B y M): <span class="mono">PM² = PA·PB</span>.',
+      'La potencia interna depende sólo de R y de PO: <span class="mono">R² − PO²</span>.',
+      'La potencia externa es <span class="mono">PO² − R²</span>.',
+      'Dadas tres circunferencias con centros no colineales, sus tres ejes radicales concurren (centro radical).',
+      'El eje radical de dos circunferencias es la recta que pasa por los puntos medios de las tangentes comunes.',
+      'Si dos circunferencias tienen una cuerda común, la recta de esa cuerda es su eje radical.',
+      'El eje radical de dos circunferencias es perpendicular a la línea de los centros.'
+    ];
+    document.getElementById('cases-list').innerHTML =
+      CASES.map((t,i)=>`<div class="problem"><span class="pn">•</span><span>${t}</span></div>`).join('');
+    document.getElementById('props-list').innerHTML =
+      PROPS.map((t,i)=>`<div class="problem"><span class="pn">${i+1}.</span><span>${t}</span></div>`).join('');
+  })();
+
+  /* =========================================================
+     SECTION 6 — Problemas relacionados
+  ========================================================= */
+  (function(){
+    const PROBS=[
+      'Por un punto en el eje radical de dos circunferencias dibujamos una secante a cada una. Estas secantes determinan cuatro puntos sobre las circunferencias. Demostrar que esos cuatro puntos forman un cuadrilátero cíclico.',
+      'Sea <span class="mono">BD</span> la bisectriz del ángulo <span class="mono">B</span> del triángulo <span class="mono">ABC</span>. El circuncírculo del triángulo <span class="mono">BDC</span> corta a <span class="mono">AB</span> en <span class="mono">E</span>, y el circuncírculo del triángulo <span class="mono">ABD</span> corta a <span class="mono">BC</span> en <span class="mono">F</span>. Demostrar que <span class="mono">AE = CF</span>.',
+      'En el triángulo <span class="mono">ABC</span> hay un punto <span class="mono">P</span> interior. Se sabe que <span class="mono">BC</span> es tangente a los circuncírculos de los triángulos <span class="mono">ABP</span> y <span class="mono">ACP</span>. Probar que <span class="mono">AP</span> corta a <span class="mono">BC</span> en su punto medio.',
+      'Sea <span class="mono">ABC</span> un triángulo isósceles (<span class="mono">AB = AC</span>) inscrito en una circunferencia. Se toman <span class="mono">P</span> y <span class="mono">Q</span> sobre <span class="mono">AB</span> y <span class="mono">AC</span>, con <span class="mono">PQ ∥ BC</span>. Si <span class="mono">PQ</span> corta la circunferencia en <span class="mono">D</span> y <span class="mono">E</span>, hallar el valor de <span class="mono">DP/EQ</span>.',
+      'Sea <span class="mono">C</span> un punto sobre un semicírculo de diámetro <span class="mono">AB</span> y sea <span class="mono">D</span> el punto medio del arco <span class="mono">AC</span>. Sea <span class="mono">E</span> la proyección de <span class="mono">D</span> sobre la recta <span class="mono">BC</span> y <span class="mono">F</span> la intersección de la recta <span class="mono">AE</span> con el semicírculo. Demostrar que <span class="mono">BF</span> biseca al segmento <span class="mono">DE</span>.',
+      'Sea <span class="mono">ABCD</span> un cuadrilátero convexo inscrito en un semicírculo <span class="mono">Γ</span> de diámetro <span class="mono">AB</span>. Los segmentos <span class="mono">AC</span> y <span class="mono">BD</span> se cortan en <span class="mono">E</span>, y <span class="mono">AD</span> y <span class="mono">BC</span> en <span class="mono">F</span>. La recta <span class="mono">EF</span> corta a <span class="mono">Γ</span> en <span class="mono">G</span> y a <span class="mono">AB</span> en <span class="mono">H</span>. Demostrar que <span class="mono">E</span> es punto medio de <span class="mono">GH</span> si y sólo si <span class="mono">G</span> es punto medio de <span class="mono">FH</span>.'
+    ];
+    document.getElementById('prob-list').innerHTML =
+      PROBS.map((t,i)=>`<div class="problem"><span class="pn">${i+1})</span><span>${t}</span></div>`).join('');
+  })();
+
+  /* =========================================================
+     SECTION 7 — Reto rápido
+  ========================================================= */
+  (function(){
+    const QUESTIONS=[
+      {q:'Si por un punto P interior trazás dos cuerdas AB y CD, entonces:',
+       opts:['AP + BP = CP + DP','AP · BP = CP · DP','AP · CP = BP · DP','AB = CD'], correct:1},
+      {q:'Desde un punto exterior P, una tangente toca en M y una secante corta en A y B. Entonces:',
+       opts:['PM = PA + PB','PM² = PA · PB','2·PM = PA · PB','PM = PA · PB'], correct:1},
+      {q:'La potencia de un punto interior (radio R, centro O) vale R² − PO². ¿Cuándo es cero?',
+       opts:['Cuando P coincide con O','Cuando P está sobre la circunferencia','Nunca','Cuando P es exterior'], correct:1},
+      {q:'El eje radical de dos circunferencias es…',
+       opts:['la recta que une los centros','el lugar de los puntos con igual potencia respecto a ambas','la mediatriz de un radio','siempre una tangente común'], correct:1},
+      {q:'Los tres ejes radicales de tres circunferencias con centros no colineales…',
+       opts:['son paralelos','concurren en un punto (centro radical)','forman un triángulo','no existen'], correct:1}
+    ];
+    const list=document.getElementById('quiz-list');
+    const scoreEl=document.getElementById('quiz-score');
+    let answered=new Array(QUESTIONS.length).fill(false), score=0;
+    function build(){
+      list.innerHTML='';
+      QUESTIONS.forEach((item,qi)=>{
+        const box=document.createElement('div'); box.className='quiz-q';
+        const p=document.createElement('p'); p.textContent=(qi+1)+'. '+item.q; box.appendChild(p);
+        const optsDiv=document.createElement('div'); optsDiv.className='quiz-opts';
+        item.opts.forEach((opt,oi)=>{
+          const btn=document.createElement('button');
+          btn.className='quiz-opt'; btn.textContent=opt;
+          btn.addEventListener('click',()=>{
+            if(answered[qi]) return;
+            answered[qi]=true;
+            const all=optsDiv.querySelectorAll('.quiz-opt');
+            all.forEach(b=>b.disabled=true);
+            if(oi===item.correct){ btn.classList.add('correct'); score++; }
+            else { btn.classList.add('wrong'); all[item.correct].classList.add('correct'); }
+            scoreEl.textContent='Puntaje: '+score+' / '+QUESTIONS.length;
+          });
+          optsDiv.appendChild(btn);
+        });
+        box.appendChild(optsDiv); list.appendChild(box);
+      });
+    }
+    document.getElementById('quiz-reset').addEventListener('click',()=>{
+      answered=new Array(QUESTIONS.length).fill(false); score=0;
+      scoreEl.textContent='Puntaje: 0 / '+QUESTIONS.length; build();
+    });
+    build();
+  })();
+
+  /* =========================================================
+     NAV
+  ========================================================= */
+  document.getElementById('tabs').addEventListener('click', e=>{
+    const btn=e.target.closest('.tab-btn'); if(!btn) return;
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b===btn));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id===btn.dataset.panel));
+  });
+
+})();
+</script>
+</body>
+</html>

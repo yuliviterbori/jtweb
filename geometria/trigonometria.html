@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introducción a la trigonometría — Geometría 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0d2136;--panel:#12314a;--panel-2:#0e2a40;--line:#25445e;--line-soft:#1c3a52;
+    --chalk:#f4efe3;--chalk-dim:#8fa8bb;--brass:#dba53c;--brass-soft:#b6832e;
+    --rust:#cf6b52;--teal:#4fada0;--good:#84b06b;--bad:#cf6b6b;--radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 32px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 32px);
+    color:var(--chalk);font-family:'Inter',system-ui,sans-serif;min-height:100vh;padding:20px 16px 60px;
+  }
+  ::selection{background:var(--brass);color:var(--ink);}
+  a{color:var(--brass);}
+  .wrap{max-width:1180px;margin:0 auto;}
+  .back-home{display:inline-flex;align-items:center;gap:6px;color:var(--chalk-dim);text-decoration:none;font-size:13px;font-weight:500;margin-bottom:16px;transition:color .15s;}
+  .back-home:hover{color:var(--brass);}
+  header.top{display:flex;align-items:center;gap:16px;margin-bottom:6px;flex-wrap:wrap;}
+  .compass-mark{flex:0 0 auto;width:46px;height:46px;}
+  .titles{flex:1 1 auto;min-width:220px;}
+  h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(22px,3.4vw,32px);font-weight:700;margin:0 0 2px;letter-spacing:-0.01em;}
+  .subtitle{color:var(--chalk-dim);font-size:13.5px;margin:0;}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.04em;color:var(--ink);background:var(--brass);padding:5px 10px;border-radius:999px;font-weight:600;white-space:nowrap;}
+  details.howto{margin:14px 0 22px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:2px 14px;}
+  details.howto summary{cursor:pointer;padding:9px 0;font-size:13px;color:var(--chalk-dim);font-weight:500;}
+  details.howto p{margin:0 0 12px;font-size:13.5px;color:var(--chalk);line-height:1.5;}
+  details.howto strong{color:var(--brass);}
+  nav.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:18px;-webkit-overflow-scrolling:touch;}
+  nav.tabs::-webkit-scrollbar{height:6px;}
+  nav.tabs::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
+  .tab-btn{flex:0 0 auto;display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);color:var(--chalk-dim);padding:9px 14px 9px 10px;border-radius:999px;font-size:13px;font-family:'Inter',sans-serif;font-weight:500;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s,border-color .15s;}
+  .tab-btn .num{font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.08);color:var(--chalk-dim);padding:2px 6px;border-radius:6px;}
+  .tab-btn.active{background:var(--brass);border-color:var(--brass);color:var(--ink);}
+  .tab-btn.active .num{background:rgba(13,33,54,0.25);color:var(--ink);}
+  .tab-btn:hover:not(.active){border-color:var(--brass-soft);color:var(--chalk);}
+  .tab-btn:focus-visible{outline:2px solid var(--brass);outline-offset:2px;}
+  .panel{display:none;}
+  .panel.active{display:block;animation:fadein .2s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+  .stage{display:grid;grid-template-columns:1.25fr 1fr;gap:20px;align-items:start;}
+  @media (max-width:880px){.stage{grid-template-columns:1fr;}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;}
+  .diagram-card svg{width:100%;height:auto;display:block;touch-action:none;}
+  .ring{fill:var(--panel-2);stroke:var(--line-soft);stroke-width:2;}
+  .stroke-dim{stroke:var(--chalk-dim);}
+  .fill-dim{fill:var(--chalk-dim);}
+  .stroke-chalk{stroke:var(--chalk);}
+  .fill-chalk{fill:var(--chalk);}
+  .stroke-brass{stroke:var(--brass);}
+  .fill-brass{fill:var(--brass);}
+  .stroke-rust{stroke:var(--rust);}
+  .fill-rust{fill:var(--rust);}
+  .stroke-teal{stroke:var(--teal);}
+  .fill-teal{fill:var(--teal);}
+  svg text{font-family:'JetBrains Mono',monospace;font-size:13px;fill:var(--chalk);user-select:none;}
+  .lbl-dim{fill:var(--chalk-dim)!important;font-size:11.5px;}
+  .lbl-big{font-size:16px;font-weight:600;}
+  .handle-hit{fill:transparent;cursor:grab;}
+  .handle-hit:active{cursor:grabbing;}
+  [data-handle]{touch-action:none;}
+  [data-handle]:hover .handle-dot{r:9.5;}
+  [data-handle]:focus-visible .handle-dot{stroke:var(--chalk);stroke-width:2;}
+  .handle-dot{r:8;fill:var(--brass);stroke:var(--ink);stroke-width:2;transition:r .1s;}
+  .handle-cross{stroke:var(--ink);stroke-width:1.4;}
+  .info-title{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:600;margin:0 0 8px;}
+  .info-text{font-size:13.5px;line-height:1.55;color:var(--chalk-dim);margin:0 0 14px;}
+  .info-text strong{color:var(--chalk);font-weight:600;}
+  .info-text .mono,.mono{font-family:'JetBrains Mono',monospace;}
+  .gauge{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:14px;box-shadow:inset 0 1px 6px rgba(0,0,0,0.25);}
+  .gauge-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:4px 0;font-size:13px;}
+  .gauge-row + .gauge-row{border-top:1px dashed var(--line-soft);}
+  .gauge-row span{color:var(--chalk-dim);}
+  .gauge-row strong{font-family:'JetBrains Mono',monospace;font-size:14.5px;color:var(--brass);font-weight:600;text-align:right;}
+  .gauge-row strong.match{color:var(--good);}
+  .formula{font-family:'JetBrains Mono',monospace;font-size:13.5px;text-align:center;color:var(--chalk);background:rgba(219,165,60,0.08);border:1px dashed var(--brass-soft);border-radius:8px;padding:8px 6px;margin-bottom:14px;}
+  .reset-btn{display:inline-flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:500;color:var(--chalk-dim);background:transparent;border:1px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer;transition:all .15s;}
+  .reset-btn:hover{border-color:var(--rust);color:var(--chalk);}
+  .reset-btn:focus-visible{outline:2px solid var(--brass);outline-offset:2px;}
+  .subhead{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--brass);margin:18px 0 10px;}
+  .subhead:first-child{margin-top:0;}
+  .prose{font-size:13.5px;line-height:1.6;color:var(--chalk-dim);margin:0 0 12px;}
+  .prose strong{color:var(--chalk);}
+  .problem{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:12px 15px;margin-bottom:10px;font-size:13.5px;line-height:1.6;color:var(--chalk);display:flex;gap:10px;}
+  .problem .pn{font-family:'JetBrains Mono',monospace;color:var(--brass);font-weight:600;flex:0 0 auto;}
+  .ntable-wrap{overflow-x:auto;margin-bottom:8px;}
+  table.ntable{border-collapse:collapse;width:100%;font-family:'JetBrains Mono',monospace;font-size:12.5px;min-width:560px;}
+  table.ntable th,table.ntable td{border:1px solid var(--line);padding:7px 8px;text-align:center;}
+  table.ntable th{background:var(--panel-2);color:var(--brass);font-family:'Inter',sans-serif;font-weight:600;}
+  table.ntable td:first-child,table.ntable th:first-child{color:var(--brass);font-weight:600;background:var(--panel-2);text-align:left;}
+  .quiz-q{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px;}
+  .quiz-q p{margin:0 0 10px;font-size:14px;font-weight:500;}
+  .quiz-opts{display:flex;flex-direction:column;gap:7px;}
+  .quiz-opt{text-align:left;font-family:'JetBrains Mono',monospace;font-size:13.5px;background:var(--panel);border:1px solid var(--line);color:var(--chalk);border-radius:8px;padding:9px 12px;cursor:pointer;transition:all .15s;}
+  .quiz-opt:hover{border-color:var(--brass-soft);}
+  .quiz-opt.correct{background:rgba(132,176,107,0.18);border-color:var(--good);color:var(--good);}
+  .quiz-opt.wrong{background:rgba(207,107,107,0.18);border-color:var(--bad);color:var(--bad);}
+  .quiz-opt:disabled{cursor:default;}
+  .quiz-score{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--brass);text-align:center;padding:10px;background:var(--panel-2);border-radius:8px;border:1px dashed var(--brass-soft);}
+  footer{text-align:center;color:var(--chalk-dim);font-size:12px;margin-top:36px;}
+  @media (prefers-reduced-motion:reduce){.panel.active{animation:none;}*{transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a href="../index.html" class="back-home">← Volver al inicio</a>
+
+  <header class="top">
+    <svg class="compass-mark" viewBox="0 0 46 46" fill="none">
+      <circle cx="23" cy="23" r="20" stroke="#dba53c" stroke-width="2"/>
+      <line x1="23" y1="4" x2="23" y2="10" stroke="#dba53c" stroke-width="2"/>
+      <line x1="23" y1="36" x2="23" y2="42" stroke="#dba53c" stroke-width="2"/>
+      <line x1="4" y1="23" x2="10" y2="23" stroke="#dba53c" stroke-width="2"/>
+      <line x1="36" y1="23" x2="42" y2="23" stroke="#dba53c" stroke-width="2"/>
+      <circle cx="23" cy="23" r="3" fill="#dba53c"/>
+      <line x1="23" y1="23" x2="34" y2="14" stroke="#f4efe3" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <div class="titles">
+      <h1>Introducción a la trigonometría</h1>
+      <p class="subtitle">Laboratorio de Matemática · Jóvenes Talentos · Geometría 2</p>
+    </div>
+    <span class="badge">CAP. 4 · TRIGONOMETRÍA</span>
+  </header>
+
+  <details class="howto">
+    <summary>Cómo usar esta clase interactiva ▾</summary>
+    <p>Arrastrá los <strong>puntos dorados</strong> para cambiar los ángulos (y, en la última sección interactiva, los vértices del triángulo). Los valores y la verificación de cada fórmula se actualizan en vivo: cuando dos expresiones coinciden, el número se pone <strong>verde</strong>. Los ángulos van medidos desde el eje x, en sentido positivo (antihorario). Navegá con las pestañas de arriba.</p>
+  </details>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab-btn active" data-panel="p0"><span class="num">01</span>Círculo unitario</button>
+    <button class="tab-btn" data-panel="p1"><span class="num">02</span>Fórmulas fundamentales</button>
+    <button class="tab-btn" data-panel="p2"><span class="num">03</span>Suma de ángulos</button>
+    <button class="tab-btn" data-panel="p3"><span class="num">04</span>Doble y mitad</button>
+    <button class="tab-btn" data-panel="p4"><span class="num">05</span>Seno y coseno</button>
+    <button class="tab-btn" data-panel="p5"><span class="num">06</span>Ángulos notables</button>
+    <button class="tab-btn" data-panel="p6"><span class="num">07</span>Aplicaciones</button>
+    <button class="tab-btn" data-panel="p7"><span class="num">08</span>Reto rápido</button>
+  </nav>
+
+  <!-- ===================== 0 · Círculo unitario ===================== -->
+  <section class="panel active" id="p0">
+    <div class="stage">
+      <div class="card diagram-card"><svg id="s0-svg" viewBox="0 0 560 560"></svg></div>
+      <div class="card">
+        <h2 class="info-title">El círculo unitario</h2>
+        <p class="info-text">Un ángulo se genera al <strong>rotar</strong> una semirrecta alrededor de su origen O. Sobre un círculo de radio r, el punto P tiene coordenadas <span class="mono">x = r·cos α</span>, <span class="mono">y = r·sen α</span>. Arrastrá P y mirá el mismo ángulo escrito en los tres sistemas y sus razones. Un ángulo llano equivale a <span class="mono">180° = 200ᵍ = π rad</span>.</p>
+        <div class="gauge">
+          <div class="gauge-row"><span>Sexagesimal</span><strong id="s0-sex">—</strong></div>
+          <div class="gauge-row"><span>Circular (radianes)</span><strong id="s0-rad">—</strong></div>
+          <div class="gauge-row"><span>Centesimal</span><strong id="s0-cen">—</strong></div>
+          <div class="gauge-row"><span>sen α &nbsp;(= y/r)</span><strong id="s0-sin">—</strong></div>
+          <div class="gauge-row"><span>cos α &nbsp;(= x/r)</span><strong id="s0-cos">—</strong></div>
+          <div class="gauge-row"><span>tg α &nbsp;(= y/x)</span><strong id="s0-tan">—</strong></div>
+        </div>
+        <button class="reset-btn" id="s0-reset">↺ Reiniciar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 1 · Fórmulas fundamentales ===================== -->
+  <section class="panel" id="p1">
+    <div class="stage">
+      <div class="card diagram-card"><svg id="s1-svg" viewBox="0 0 560 560"></svg></div>
+      <div class="card">
+        <h2 class="info-title">Fórmulas del primer grupo</h2>
+        <p class="info-text">Las cinco fórmulas fundamentales valen para <strong>cualquier</strong> cuadrante. Arrastrá P: cada producto se mantiene en su valor (en verde cuando coincide).</p>
+        <div class="formula">sen²α + cos²α = 1</div>
+        <div class="gauge">
+          <div class="gauge-row"><span>sen²α + cos²α</span><strong id="s1-pit">—</strong></div>
+          <div class="gauge-row"><span>tg α · cotg α</span><strong id="s1-tc">—</strong></div>
+          <div class="gauge-row"><span>sec α · cos α</span><strong id="s1-sec">—</strong></div>
+          <div class="gauge-row"><span>cosec α · sen α</span><strong id="s1-csc">—</strong></div>
+          <div class="gauge-row"><span>tg α &nbsp;vs&nbsp; sen α / cos α</span><strong id="s1-tan">—</strong></div>
+        </div>
+        <button class="reset-btn" id="s1-reset">↺ Reiniciar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 2 · Suma de ángulos ===================== -->
+  <section class="panel" id="p2">
+    <div class="stage">
+      <div class="card diagram-card"><svg id="s2-svg" viewBox="0 0 560 560"></svg></div>
+      <div class="card">
+        <h2 class="info-title">Fórmulas de la suma</h2>
+        <p class="info-text">Arrastrá los radios <strong>α</strong> (dorado) y <strong>β</strong> (verde). El radio óxido marca <strong>α+β</strong>. Comparamos el valor directo con el que dan las fórmulas de la suma.</p>
+        <div class="formula">sen(α+β) = senα·cosβ + cosα·senβ</div>
+        <div class="gauge">
+          <div class="gauge-row"><span>sen(α+β) directo</span><strong id="s2-sd">—</strong></div>
+          <div class="gauge-row"><span>senα·cosβ + cosα·senβ</span><strong id="s2-sf">—</strong></div>
+          <div class="gauge-row"><span>cos(α+β) directo</span><strong id="s2-cd">—</strong></div>
+          <div class="gauge-row"><span>cosα·cosβ − senα·senβ</span><strong id="s2-cf">—</strong></div>
+          <div class="gauge-row"><span>tg(α+β) directo</span><strong id="s2-td">—</strong></div>
+          <div class="gauge-row"><span>(tgα+tgβ)/(1−tgα·tgβ)</span><strong id="s2-tf">—</strong></div>
+        </div>
+        <button class="reset-btn" id="s2-reset">↺ Reiniciar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 3 · Doble y mitad ===================== -->
+  <section class="panel" id="p3">
+    <div class="stage">
+      <div class="card diagram-card"><svg id="s3-svg" viewBox="0 0 560 560"></svg></div>
+      <div class="card">
+        <h2 class="info-title">Arco doble y arco mitad</h2>
+        <p class="info-text">Arrastrá <strong>α</strong> (dorado). El radio óxido es <strong>2α</strong> y el verde es <strong>α/2</strong>. Se comparan los valores directos con las fórmulas del arco doble y del arco mitad.</p>
+        <div class="formula">sen2α = 2·senα·cosα&nbsp;&nbsp;·&nbsp;&nbsp;cos2α = cos²α − sen²α</div>
+        <div class="gauge">
+          <div class="gauge-row"><span>sen 2α &nbsp;vs&nbsp; 2·senα·cosα</span><strong id="s3-s2">—</strong></div>
+          <div class="gauge-row"><span>cos 2α &nbsp;vs&nbsp; cos²α − sen²α</span><strong id="s3-c2">—</strong></div>
+          <div class="gauge-row"><span>tg 2α &nbsp;vs&nbsp; 2tgα/(1−tg²α)</span><strong id="s3-t2">—</strong></div>
+          <div class="gauge-row"><span>sen(α/2) &nbsp;vs&nbsp; √((1−cosα)/2)</span><strong id="s3-sh">—</strong></div>
+          <div class="gauge-row"><span>tg(α/2) &nbsp;vs&nbsp; (1−cosα)/senα</span><strong id="s3-th">—</strong></div>
+        </div>
+        <button class="reset-btn" id="s3-reset">↺ Reiniciar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 4 · Seno y coseno ===================== -->
+  <section class="panel" id="p4">
+    <div class="stage">
+      <div class="card diagram-card"><svg id="s4-svg" viewBox="0 0 560 560"></svg></div>
+      <div class="card">
+        <h2 class="info-title">Teoremas del seno y del coseno</h2>
+        <p class="info-text">Arrastrá los vértices <strong>A, B, C</strong>. El <strong>teorema del seno</strong> dice que <span class="mono">a/senA = b/senB = c/senC = 2R</span> (R = circunradio, círculo punteado). El <strong>teorema del coseno</strong>: <span class="mono">a² = b² + c² − 2bc·cosA</span>.</p>
+        <div class="gauge">
+          <div class="gauge-row"><span>a / sen A</span><strong id="s4-ra">—</strong></div>
+          <div class="gauge-row"><span>b / sen B</span><strong id="s4-rb">—</strong></div>
+          <div class="gauge-row"><span>c / sen C</span><strong id="s4-rc">—</strong></div>
+          <div class="gauge-row"><span>2R (circundiámetro)</span><strong id="s4-2r">—</strong></div>
+          <div class="gauge-row"><span>a² − (b²+c²−2bc·cosA)</span><strong id="s4-cos">—</strong></div>
+        </div>
+        <button class="reset-btn" id="s4-reset">↺ Reiniciar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 5 · Ángulos notables ===================== -->
+  <section class="panel" id="p5">
+    <div class="card" style="max-width:820px;margin:0 auto;">
+      <h2 class="info-title">Razones trigonométricas en ángulos notables</h2>
+      <div class="ntable-wrap">
+        <table class="ntable">
+          <thead><tr><th>α</th><th>0°</th><th>30°</th><th>45°</th><th>60°</th><th>90°</th><th>120°</th><th>180°</th><th>270°</th><th>360°</th></tr></thead>
+          <tbody>
+            <tr><td>sen α</td><td>0</td><td>1/2</td><td>√2/2</td><td>√3/2</td><td>1</td><td>√3/2</td><td>0</td><td>−1</td><td>0</td></tr>
+            <tr><td>cos α</td><td>1</td><td>√3/2</td><td>√2/2</td><td>1/2</td><td>0</td><td>−1/2</td><td>−1</td><td>0</td><td>1</td></tr>
+            <tr><td>tg α</td><td>0</td><td>1/√3</td><td>1</td><td>√3</td><td>∞</td><td>−√3</td><td>0</td><td>∞</td><td>0</td></tr>
+            <tr><td>cotg α</td><td>∞</td><td>√3</td><td>1</td><td>1/√3</td><td>0</td><td>−1/√3</td><td>∞</td><td>0</td><td>∞</td></tr>
+            <tr><td>sec α</td><td>1</td><td>2/√3</td><td>√2</td><td>2</td><td>∞</td><td>−2</td><td>−1</td><td>∞</td><td>1</td></tr>
+            <tr><td>cosec α</td><td>∞</td><td>2</td><td>√2</td><td>2/√3</td><td>1</td><td>2/√3</td><td>∞</td><td>−1</td><td>∞</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="info-text" style="margin-top:10px;">Los signos siguen la regla de los cuadrantes: en el I todas positivas; en el II sólo seno (y cosecante); en el III sólo tangente (y cotangente); en el IV sólo coseno (y secante).</p>
+    </div>
+  </section>
+
+  <!-- ===================== 6 · Aplicaciones ===================== -->
+  <section class="panel" id="p6">
+    <div class="card" style="max-width:760px;margin:0 auto;">
+      <h2 class="info-title">Aplicaciones de la trigonometría</h2>
+
+      <div class="subhead">1 · Identidades trigonométricas</div>
+      <p class="prose">Una <strong>identidad</strong> es una igualdad entre expresiones con funciones trigonométricas que se verifica para <strong>cualquier</strong> valor de los arcos. Verificar una identidad es transformar uno de los miembros, usando las fórmulas, hasta obtener el otro. Una identidad <strong>condicionada</strong> es la que sólo vale cuando los arcos cumplen ciertas condiciones dadas.</p>
+
+      <div class="subhead">2 · Resolución de triángulos oblicuángulos</div>
+      <p class="prose">Si te dan <strong>dos ángulos y un lado</strong>, usá el <strong>teorema del seno</strong>: <span class="mono">a/senA = b/senB = c/senC</span>. Si te dan <strong>dos lados y el ángulo que forman</strong>, usá el <strong>teorema del coseno</strong>: <span class="mono">a² = b² + c² − 2bc·cosA</span>.</p>
+
+      <div class="subhead">Problemas relacionados</div>
+      <div id="prob-list"></div>
+    </div>
+  </section>
+
+  <!-- ===================== 7 · Reto rápido ===================== -->
+  <section class="panel" id="p7">
+    <div class="card" style="max-width:640px;margin:0 auto;">
+      <h2 class="info-title">Reto rápido</h2>
+      <p class="info-text">Cinco preguntas para cerrar la clase. Tocá una opción para responder.</p>
+      <div id="quiz-list"></div>
+      <div class="quiz-score" id="quiz-score">Puntaje: 0 / 5</div>
+      <div style="text-align:center;margin-top:12px;">
+        <button class="reset-btn" id="quiz-reset">↺ Reintentar</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>OMAPA · Laboratorio de Matemática — hecho para compartir en clase virtual</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const CX=280, CY=280, R=150, O={x:CX,y:CY};
+  const PI=Math.PI;
+  const toDeg=r=>r*180/PI, rad=d=>d*PI/180, mod360=a=>((a%360)+360)%360;
+  const dist=(p,q)=>Math.hypot(p.x-q.x,p.y-q.y);
+  // punto del círculo unitario con y hacia arriba (ángulo antihorario desde eje x)
+  const uc=(a,r)=>({x:CX+(r||R)*Math.cos(rad(a)), y:CY-(r||R)*Math.sin(rad(a))});
+  const angFromPointer=p=>mod360(toDeg(Math.atan2(-(p.y-CY), p.x-CX)));
+
+  const num=(v,dg)=>{ if(!isFinite(v)) return '∞'; const k=Math.pow(10,dg===undefined?3:dg); let r=Math.round(v*k)/k; if(Object.is(r,-0))r=0; return r.toString(); };
+  const close=(a,b)=>{ if(!isFinite(a)&&!isFinite(b))return true; if(!isFinite(a)||!isFinite(b))return false; return Math.abs(a-b)<1e-6*(1+Math.abs(a)); };
+  function setPair(id,val,ref){ const el=document.getElementById(id); el.textContent=num(val); el.classList.toggle('match', close(val,ref)); }
+
+  function segLine(p,q,cls,w,dash){ return `<line x1="${p.x.toFixed(1)}" y1="${p.y.toFixed(1)}" x2="${q.x.toFixed(1)}" y2="${q.y.toFixed(1)}" class="${cls}" stroke-width="${w||2}"${dash?` stroke-dasharray="${dash}"`:''}/>`; }
+  function dot(p,label,cls,dx,dy){ return `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" class="${cls}"/>`+(label?`<text x="${(p.x+(dx===undefined?8:dx)).toFixed(1)}" y="${(p.y+(dy===undefined?-8:dy)).toFixed(1)}" class="${cls}">${label}</text>`:''); }
+  function handle(id,p,label,dx,dy){
+    dx=dx===undefined?14:dx; dy=dy===undefined?-14:dy;
+    return `<g data-handle="${id}" tabindex="0" aria-label="Punto ${label||id}">
+      <circle class="handle-hit" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="22"/>
+      <line class="handle-cross" x1="${(p.x-6).toFixed(2)}" y1="${p.y.toFixed(2)}" x2="${(p.x+6).toFixed(2)}" y2="${p.y.toFixed(2)}"/>
+      <line class="handle-cross" x1="${p.x.toFixed(2)}" y1="${(p.y-6).toFixed(2)}" x2="${p.x.toFixed(2)}" y2="${(p.y+6).toFixed(2)}"/>
+      <circle class="handle-dot" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}"/>
+      ${label?`<text x="${(p.x+dx).toFixed(2)}" y="${(p.y+dy).toFixed(2)}" class="lbl-big fill-brass">${label}</text>`:''}
+    </g>`;
+  }
+  function svgPt(svg,evt){ const pt=svg.createSVGPoint(); pt.x=evt.clientX; pt.y=evt.clientY; return pt.matrixTransform(svg.getScreenCTM().inverse()); }
+  function wireDrag(svg,onMove){
+    let active=null;
+    svg.addEventListener('pointerdown',e=>{ const g=e.target.closest('[data-handle]'); if(!g)return; e.preventDefault(); active=g.dataset.handle; });
+    document.addEventListener('pointermove',e=>{ if(!active)return; onMove(active,svgPt(svg,e)); });
+    document.addEventListener('pointerup',()=>{active=null;});
+    document.addEventListener('pointercancel',()=>{active=null;});
+    svg.addEventListener('keydown',e=>{ const g=e.target.closest('[data-handle]'); if(!g)return; const s=(e.key==='ArrowLeft'||e.key==='ArrowDown')?-2:(e.key==='ArrowRight'||e.key==='ArrowUp')?2:0; if(!s)return; e.preventDefault(); onMove(g.dataset.handle,null,s); });
+  }
+  function axes(){
+    let s='';
+    s+=segLine({x:CX-R-22,y:CY},{x:CX+R+22,y:CY},'stroke-dim',1);
+    s+=segLine({x:CX,y:CY-R-22},{x:CX,y:CY+R+22},'stroke-dim',1);
+    s+=`<text x="${CX+R+14}" y="${CY-6}" class="lbl-dim">A</text>`;
+    s+=`<text x="${CX-R-22}" y="${CY-6}" class="lbl-dim">A'</text>`;
+    s+=`<text x="${CX+7}" y="${CY-R-13}" class="lbl-dim">B</text>`;
+    s+=`<text x="${CX+7}" y="${CY+R+23}" class="lbl-dim">B'</text>`;
+    return s;
+  }
+  const unitBase=()=>`<circle cx="${CX}" cy="${CY}" r="${R}" class="ring"/>`+axes()+`<circle cx="${CX}" cy="${CY}" r="3" class="fill-dim"/><text x="${CX-16}" y="${CY+15}" class="lbl-dim">O</text>`;
+  // arco (polilínea) de a0 a a1 en sentido antihorario, radio rr
+  function ucArc(a0,a1,rr,cls){
+    const sweep=mod360(a1-a0); const steps=Math.max(2,Math.round(sweep/6)); let d='';
+    for(let i=0;i<=steps;i++){ const p=uc(a0+sweep*(i/steps),rr); d+=(i===0?'M':'L')+p.x.toFixed(1)+' '+p.y.toFixed(1)+' '; }
+    return `<path d="${d}" fill="none" class="${cls}" stroke-width="2"/>`;
+  }
+  const radStr=a=>`${(a/180).toFixed(2)}π ≈ ${(a*PI/180).toFixed(2)}`;
+
+  /* ============ 0 · Círculo unitario ============ */
+  (function(){
+    const svg=document.getElementById('s0-svg');
+    const DEF={a:50}; let st={...DEF};
+    function render(){
+      const a=st.a, P=uc(a), Q={x:P.x,y:CY};
+      let s=unitBase();
+      s+=ucArc(0,a,34,'stroke-brass');
+      s+=segLine(O,Q,'stroke-teal',2.5);
+      s+=segLine(Q,P,'stroke-rust',2.5);
+      s+=segLine(O,P,'stroke-brass',2.5);
+      const mid=uc(a/2,52);
+      s+=`<text x="${mid.x.toFixed(1)}" y="${mid.y.toFixed(1)}" class="fill-brass">α</text>`;
+      s+=dot(P,'P','fill-chalk',10,-8);
+      s+=handle('P',P,'',0,0);
+      svg.innerHTML=s;
+      const sn=Math.sin(rad(a)), cs=Math.cos(rad(a)), tn=Math.abs(cs)<1e-9?Infinity:sn/cs;
+      document.getElementById('s0-sex').textContent=num(a,1)+'°';
+      document.getElementById('s0-rad').textContent=radStr(a);
+      document.getElementById('s0-cen').textContent=num(a*10/9,1)+'ᵍ';
+      document.getElementById('s0-sin').textContent=num(sn);
+      document.getElementById('s0-cos').textContent=num(cs);
+      document.getElementById('s0-tan').textContent=num(tn);
+    }
+    wireDrag(svg,(id,p,step)=>{ st.a = p? angFromPointer(p) : mod360(st.a+step); render(); });
+    document.getElementById('s0-reset').addEventListener('click',()=>{ st={...DEF}; render(); });
+    render();
+  })();
+
+  /* ============ 1 · Fórmulas fundamentales ============ */
+  (function(){
+    const svg=document.getElementById('s1-svg');
+    const DEF={a:50}; let st={...DEF};
+    function render(){
+      const a=st.a, P=uc(a), Q={x:P.x,y:CY};
+      let s=unitBase();
+      s+=segLine(O,Q,'stroke-teal',2.5);
+      s+=segLine(Q,P,'stroke-rust',2.5);
+      s+=segLine(O,P,'stroke-brass',2.5);
+      s+=`<text x="${(Q.x+ (P.x<CX?-14:6)).toFixed(1)}" y="${CY+16}" class="fill-teal">cos</text>`;
+      s+=`<text x="${(P.x+8).toFixed(1)}" y="${((P.y+Q.y)/2).toFixed(1)}" class="fill-rust">sen</text>`;
+      s+=dot(P,'P','fill-chalk',10,-8);
+      s+=handle('P',P,'',0,0);
+      svg.innerHTML=s;
+      const sn=Math.sin(rad(a)), cs=Math.cos(rad(a));
+      const tn=Math.abs(cs)<1e-9?Infinity:sn/cs, ct=Math.abs(sn)<1e-9?Infinity:cs/sn;
+      setPair('s1-pit', sn*sn+cs*cs, 1);
+      setPair('s1-tc', (isFinite(tn)&&isFinite(ct))? tn*ct : NaN, 1);
+      setPair('s1-sec', Math.abs(cs)<1e-9? NaN : (1/cs)*cs, 1);
+      setPair('s1-csc', Math.abs(sn)<1e-9? NaN : (1/sn)*sn, 1);
+      const el=document.getElementById('s1-tan'); el.textContent=num(tn); el.classList.toggle('match', close(tn, Math.abs(cs)<1e-9?Infinity:sn/cs));
+    }
+    wireDrag(svg,(id,p,step)=>{ st.a = p? angFromPointer(p) : mod360(st.a+step); render(); });
+    document.getElementById('s1-reset').addEventListener('click',()=>{ st={...DEF}; render(); });
+    render();
+  })();
+
+  /* ============ 2 · Suma de ángulos ============ */
+  (function(){
+    const svg=document.getElementById('s2-svg');
+    const DEF={a:35,b:40}; let st={...DEF};
+    function render(){
+      const a=st.a, b=st.b, Pa=uc(a), Pb=uc(b), Pab=uc(a+b);
+      let s=unitBase();
+      s+=ucArc(0,a,30,'stroke-brass');
+      s+=ucArc(a,a+b,42,'stroke-teal');
+      s+=segLine(O,Pab,'stroke-rust',2.5);
+      s+=segLine(O,Pa,'stroke-brass',2.5);
+      s+=segLine(O,Pb,'stroke-teal',2.5);
+      s+=dot(Pab,'α+β','fill-rust',8,-8);
+      s+=handle('A',Pa,'α',10,-6); s+=handle('B',Pb,'β',10,-6);
+      svg.innerHTML=s;
+      const sa=Math.sin(rad(a)),ca=Math.cos(rad(a)),sb=Math.sin(rad(b)),cb=Math.cos(rad(b));
+      const ta=Math.tan(rad(a)),tb=Math.tan(rad(b));
+      const sd=Math.sin(rad(a+b)), cd=Math.cos(rad(a+b)), td=Math.tan(rad(a+b));
+      const sf=sa*cb+ca*sb, cf=ca*cb-sa*sb, tf=(ta+tb)/(1-ta*tb);
+      document.getElementById('s2-sd').textContent=num(sd);
+      document.getElementById('s2-cd').textContent=num(cd);
+      document.getElementById('s2-td').textContent=num(td);
+      setPair('s2-sf', sf, sd);
+      setPair('s2-cf', cf, cd);
+      setPair('s2-tf', tf, td);
+    }
+    wireDrag(svg,(id,p,step)=>{
+      if(id==='A') st.a = p? angFromPointer(p) : mod360(st.a+step);
+      else st.b = p? angFromPointer(p) : mod360(st.b+step);
+      render();
+    });
+    document.getElementById('s2-reset').addEventListener('click',()=>{ st={...DEF}; render(); });
+    render();
+  })();
+
+  /* ============ 3 · Doble y mitad ============ */
+  (function(){
+    const svg=document.getElementById('s3-svg');
+    const DEF={a:50}; let st={...DEF};
+    function render(){
+      const a=st.a, P=uc(a), P2=uc(2*a), Ph=uc(a/2);
+      let s=unitBase();
+      s+=segLine(O,P2,'stroke-rust',2.5);
+      s+=segLine(O,Ph,'stroke-teal',2.5);
+      s+=segLine(O,P,'stroke-brass',2.5);
+      s+=dot(P2,'2α','fill-rust',8,-8); s+=dot(Ph,'α/2','fill-teal',8,16);
+      s+=handle('A',P,'α',10,-6);
+      svg.innerHTML=s;
+      const sn=Math.sin(rad(a)),cs=Math.cos(rad(a)),tn=Math.tan(rad(a));
+      const s2=Math.sin(rad(2*a)), c2=Math.cos(rad(2*a)), t2=Math.tan(rad(2*a));
+      const sh=Math.sin(rad(a/2)), th=Math.tan(rad(a/2));
+      setPair('s3-s2', 2*sn*cs, s2);
+      setPair('s3-c2', cs*cs-sn*sn, c2);
+      setPair('s3-t2', (2*tn)/(1-tn*tn), t2);
+      setPair('s3-sh', Math.sqrt((1-cs)/2), sh);
+      setPair('s3-th', Math.abs(sn)<1e-9? NaN : (1-cs)/sn, th);
+    }
+    wireDrag(svg,(id,p,step)=>{ st.a = p? angFromPointer(p) : mod360(st.a+step); render(); });
+    document.getElementById('s3-reset').addEventListener('click',()=>{ st={...DEF}; render(); });
+    render();
+  })();
+
+  /* ============ 4 · Seno y coseno ============ */
+  (function(){
+    const svg=document.getElementById('s4-svg');
+    const DEF={A:{x:150,y:380}, B:{x:430,y:360}, C:{x:300,y:150}}; let st=JSON.parse(JSON.stringify(DEF));
+    function angAt(v,p,q){ const u={x:p.x-v.x,y:p.y-v.y}, w={x:q.x-v.x,y:q.y-v.y}; const m=Math.hypot(u.x,u.y)*Math.hypot(w.x,w.y); if(m<1e-6)return 0; return Math.acos(Math.max(-1,Math.min(1,(u.x*w.x+u.y*w.y)/m))); }
+    function circum(A,B,C){
+      const d=2*(A.x*(B.y-C.y)+B.x*(C.y-A.y)+C.x*(A.y-B.y));
+      if(Math.abs(d)<1e-6) return null;
+      const a2=A.x*A.x+A.y*A.y, b2=B.x*B.x+B.y*B.y, c2=C.x*C.x+C.y*C.y;
+      const ux=(a2*(B.y-C.y)+b2*(C.y-A.y)+c2*(A.y-B.y))/d;
+      const uy=(a2*(C.x-B.x)+b2*(A.x-C.x)+c2*(B.x-A.x))/d;
+      return {x:ux,y:uy,r:Math.hypot(A.x-ux,A.y-uy)};
+    }
+    function clamp(p){ return {x:Math.max(30,Math.min(530,p.x)), y:Math.max(30,Math.min(530,p.y))}; }
+    function render(){
+      const A=st.A,B=st.B,C=st.C;
+      const a=dist(B,C), b=dist(C,A), c=dist(A,B);
+      const AA=angAt(A,B,C), BB=angAt(B,A,C), CC=angAt(C,A,B);
+      const cc=circum(A,B,C);
+      let s='';
+      if(cc) s+=`<circle cx="${cc.x.toFixed(1)}" cy="${cc.y.toFixed(1)}" r="${cc.r.toFixed(1)}" fill="none" class="stroke-dim" stroke-width="1.2" stroke-dasharray="5 5" opacity="0.6"/>`;
+      s+=`<polygon points="${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}" fill="rgba(219,165,60,0.06)" class="stroke-brass" stroke-width="2.5"/>`;
+      const mBC={x:(B.x+C.x)/2,y:(B.y+C.y)/2}, mCA={x:(C.x+A.x)/2,y:(C.y+A.y)/2}, mAB={x:(A.x+B.x)/2,y:(A.y+B.y)/2};
+      s+=`<text x="${mBC.x.toFixed(1)}" y="${mBC.y.toFixed(1)}" class="fill-teal">a</text>`;
+      s+=`<text x="${mCA.x.toFixed(1)}" y="${mCA.y.toFixed(1)}" class="fill-teal">b</text>`;
+      s+=`<text x="${mAB.x.toFixed(1)}" y="${mAB.y.toFixed(1)}" class="fill-teal">c</text>`;
+      s+=handle('A',A,'A'); s+=handle('B',B,'B'); s+=handle('C',C,'C');
+      svg.innerHTML=s;
+      const ra=a/Math.sin(AA), rb=b/Math.sin(BB), rc=c/Math.sin(CC);
+      const eq = close(ra,rb)&&close(rb,rc);
+      const setR=(id,v)=>{ const el=document.getElementById(id); el.textContent=num(v,1); el.classList.toggle('match',eq); };
+      setR('s4-ra',ra); setR('s4-rb',rb); setR('s4-rc',rc);
+      document.getElementById('s4-2r').textContent=num(cc?2*cc.r:NaN,1);
+      const dcos=a*a-(b*b+c*c-2*b*c*Math.cos(AA));
+      const el=document.getElementById('s4-cos'); el.textContent=num(dcos,1); el.classList.toggle('match',Math.abs(dcos)<Math.max(1,0.002*a*a));
+    }
+    wireDrag(svg,(id,p,step)=>{
+      if(!p) return;
+      st[id]=clamp(p); render();
+    });
+    document.getElementById('s4-reset').addEventListener('click',()=>{ st=JSON.parse(JSON.stringify(DEF)); render(); });
+    render();
+  })();
+
+  /* ============ 6 · Problemas ============ */
+  (function(){
+    const PROBS=[
+      'Demostrar que <span class="mono">tg x + cotg x = sec x · cosec x</span>.',
+      'Probar que <span class="mono">sec²x + cosec²x = sec²x · cosec²x</span>.',
+      'Dado un triángulo de lados <span class="mono">a, b, c</span> y ángulos <span class="mono">A, B, C</span>, demostrar que el área es <span class="mono">(ABC) = (a·c·sen B)/2</span>.',
+      'Dado un triángulo de lados <span class="mono">a, b, c</span> y circunradio <span class="mono">R</span>, demostrar que el área es <span class="mono">(ABC) = abc/(4R)</span>.',
+      'Sea <span class="mono">ABC</span> con <span class="mono">AB = BC</span> y <span class="mono">∠CBA = 30°</span>. Sean <span class="mono">D</span> el pie de la altura desde <span class="mono">A</span> y <span class="mono">M</span> el punto medio de <span class="mono">BC</span>. Sea <span class="mono">P</span> el pie de la perpendicular desde <span class="mono">M</span> a la paralela a <span class="mono">BC</span> por <span class="mono">A</span>. El segmento <span class="mono">MP</span> cruza a la altura desde <span class="mono">B</span> hacia <span class="mono">AC</span> en <span class="mono">R</span>. Hallar <span class="mono">RB/RP</span>.',
+      'En el triángulo <span class="mono">ABC</span>, la altura y la mediana desde <span class="mono">C</span> dividen al <span class="mono">∠C</span> en tres ángulos iguales. Hallar los ángulos del triángulo.',
+      'Sean <span class="mono">Γ₁</span> y <span class="mono">Γ₂</span> dos circunferencias tangentes externamente en <span class="mono">S</span>, con el radio de <span class="mono">Γ₂</span> igual al triple del de <span class="mono">Γ₁</span>. Una recta es tangente a <span class="mono">Γ₁</span> en <span class="mono">P</span> y a <span class="mono">Γ₂</span> en <span class="mono">Q</span> (con <span class="mono">P, Q ≠ S</span>). Sea <span class="mono">T</span> el punto de <span class="mono">Γ₂</span> tal que <span class="mono">TQ</span> es diámetro, y <span class="mono">R</span> la intersección de la bisectriz de <span class="mono">∠SQT</span> con <span class="mono">ST</span>. Demostrar que <span class="mono">QR = RT</span>.',
+      'Hallar (sin usar calculadora) el valor de <span class="mono">sen 18°</span>.'
+    ];
+    document.getElementById('prob-list').innerHTML = PROBS.map((t,i)=>`<div class="problem"><span class="pn">${i+1})</span><span>${t}</span></div>`).join('');
+  })();
+
+  /* ============ 7 · Reto rápido ============ */
+  (function(){
+    const QUESTIONS=[
+      {q:'Un ángulo llano (media circunferencia) equivale a:',
+       opts:['90° = π/2 rad','180° = π rad = 200ᵍ','360° = 2π rad','100ᵍ = π/2 rad'], correct:1},
+      {q:'La primera fórmula fundamental es:',
+       opts:['sen α · cos α = 1','sen²α + cos²α = 1','sen²α − cos²α = 1','tg²α + 1 = sec α'], correct:1},
+      {q:'sen(α + β) es igual a:',
+       opts:['senα·senβ + cosα·cosβ','senα·cosβ + cosα·senβ','senα·cosβ − cosα·senβ','senα + senβ'], correct:1},
+      {q:'sen 2α es igual a:',
+       opts:['2·senα','2·senα·cosα','sen²α − cos²α','1 − 2sen²α'], correct:1},
+      {q:'Si conocés dos lados y el ángulo que forman, para hallar el tercer lado conviene usar:',
+       opts:['el teorema del seno','el teorema del coseno','la fórmula del arco mitad','la primera fórmula fundamental'], correct:1}
+    ];
+    const list=document.getElementById('quiz-list'), scoreEl=document.getElementById('quiz-score');
+    let answered=new Array(QUESTIONS.length).fill(false), score=0;
+    function build(){
+      list.innerHTML='';
+      QUESTIONS.forEach((item,qi)=>{
+        const box=document.createElement('div'); box.className='quiz-q';
+        const p=document.createElement('p'); p.textContent=(qi+1)+'. '+item.q; box.appendChild(p);
+        const od=document.createElement('div'); od.className='quiz-opts';
+        item.opts.forEach((opt,oi)=>{
+          const btn=document.createElement('button'); btn.className='quiz-opt'; btn.textContent=opt;
+          btn.addEventListener('click',()=>{
+            if(answered[qi])return; answered[qi]=true;
+            const all=od.querySelectorAll('.quiz-opt'); all.forEach(b=>b.disabled=true);
+            if(oi===item.correct){ btn.classList.add('correct'); score++; }
+            else { btn.classList.add('wrong'); all[item.correct].classList.add('correct'); }
+            scoreEl.textContent='Puntaje: '+score+' / '+QUESTIONS.length;
+          });
+          od.appendChild(btn);
+        });
+        box.appendChild(od); list.appendChild(box);
+      });
+    }
+    document.getElementById('quiz-reset').addEventListener('click',()=>{ answered=new Array(QUESTIONS.length).fill(false); score=0; scoreEl.textContent='Puntaje: 0 / '+QUESTIONS.length; build(); });
+    build();
+  })();
+
+  /* ============ NAV ============ */
+  document.getElementById('tabs').addEventListener('click', e=>{
+    const btn=e.target.closest('.tab-btn'); if(!btn) return;
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b===btn));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id===btn.dataset.panel));
+  });
+})();
+</script>
+</body>
+</html>

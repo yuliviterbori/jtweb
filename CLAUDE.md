@@ -34,11 +34,28 @@ Los archivos están organizados en carpetas por módulo. `index.html` queda en l
   juego interactivo con IA óptima (minimax sobre máscara+resto).
 
 **`geometria/`**
-- `circunferencia.html` — "Explorador de la circunferencia": lugar geométrico,
-  elementos (cuerda, diámetro, secante, tangente, sagita), ángulos central/inscrito/
-  ex-inscrito/interior/exterior, arco capaz y un reto rápido. Diagramas SVG con puntos
-  arrastrables (mouse y táctil). **Usa su propio tema visual de "pizarrón"** (fondo azul
-  oscuro `--ink`, dorado `--brass`, tipografía Space Grotesk), distinto del resto del sitio.
+- `circunferencia.html` — **Capítulo 1.** "Explorador de la circunferencia": lugar
+  geométrico, elementos (cuerda, diámetro, secante, tangente, sagita), ángulos central/
+  inscrito/ex-inscrito/interior/exterior, arco capaz y un reto rápido. Diagramas SVG con
+  puntos arrastrables (mouse y táctil). **Usa su propio tema visual de "pizarrón"** (fondo
+  azul oscuro `--ink`, dorado `--brass`, tipografía Space Grotesk), distinto del resto del
+  sitio.
+- `cuadrilateros_ciclicos.html` — **Capítulo 2.** "Cuadriláteros cíclicos": definición,
+  las tres propiedades (ángulos opuestos suplementarios, diagonales/ángulos inscritos,
+  ángulo exterior = interior opuesto), el **Teorema de Ptolomeo** con verificación numérica
+  en vivo, los 10 problemas propuestos y un reto rápido. Mismo tema de pizarrón que el Cap. 1.
+- `potencia_de_un_punto.html` — **Capítulo 3.** "Potencia de un punto": potencia interna
+  (AP·BP = CP·DP) y externa (PA·PB = PC·PD), secante y tangente (PM² = PA·PB), la fórmula
+  R² − PO², y el **eje radical** de dos circunferencias (recta ⊥ a la línea de centros,
+  igual potencia respecto a ambas), todo con verificación en vivo; más propiedades, casos y
+  6 problemas relacionados. Mismo tema de pizarrón.
+- `trigonometria.html` — **Capítulo 4.** "Introducción a la trigonometría": círculo unitario
+  y los tres sistemas de medida (sexagesimal/centesimal/circular), fórmulas fundamentales,
+  de la suma, de arco doble y mitad, y los teoremas del seno y del coseno (triángulo
+  arrastrable con circunradio), todo con verificación numérica en vivo; más la tabla de
+  ángulos notables, aplicaciones y 8 problemas. Mismo tema de pizarrón.
+
+En Geometría se hace **un archivo por capítulo** del material del curso.
 
 Cada página de tópico tiene un enlace "← Volver al inicio" hacia `../index.html`.
 

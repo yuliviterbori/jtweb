@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuadriláteros cíclicos — Geometría 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0d2136;
+    --panel:#12314a;
+    --panel-2:#0e2a40;
+    --line:#25445e;
+    --line-soft:#1c3a52;
+    --chalk:#f4efe3;
+    --chalk-dim:#8fa8bb;
+    --brass:#dba53c;
+    --brass-soft:#b6832e;
+    --rust:#cf6b52;
+    --teal:#4fada0;
+    --good:#84b06b;
+    --bad:#cf6b6b;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 32px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 32px);
+    color:var(--chalk);
+    font-family:'Inter',system-ui,sans-serif;
+    min-height:100vh;
+    padding:20px 16px 60px;
+  }
+  ::selection{background:var(--brass);color:var(--ink);}
+  a{color:var(--brass);}
+
+  .wrap{max-width:1180px;margin:0 auto;}
+
+  .back-home{
+    display:inline-flex;align-items:center;gap:6px;
+    color:var(--chalk-dim);text-decoration:none;
+    font-size:13px;font-weight:500;margin-bottom:16px;
+    transition:color .15s;
+  }
+  .back-home:hover{color:var(--brass);}
+
+  header.top{display:flex;align-items:center;gap:16px;margin-bottom:6px;flex-wrap:wrap;}
+  .compass-mark{flex:0 0 auto;width:46px;height:46px;}
+  .titles{flex:1 1 auto;min-width:220px;}
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(22px,3.4vw,32px);
+    font-weight:700;
+    margin:0 0 2px;
+    letter-spacing:-0.01em;
+  }
+  .subtitle{color:var(--chalk-dim);font-size:13.5px;margin:0;}
+  .badge{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.04em;
+    color:var(--ink);
+    background:var(--brass);
+    padding:5px 10px;
+    border-radius:999px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+
+  details.howto{
+    margin:14px 0 22px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:2px 14px;
+  }
+  details.howto summary{
+    cursor:pointer;
+    padding:9px 0;
+    font-size:13px;
+    color:var(--chalk-dim);
+    font-weight:500;
+  }
+  details.howto p{margin:0 0 12px;font-size:13.5px;color:var(--chalk);line-height:1.5;}
+  details.howto strong{color:var(--brass);}
+
+  nav.tabs{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding-bottom:8px;
+    margin-bottom:18px;
+    -webkit-overflow-scrolling:touch;
+  }
+  nav.tabs::-webkit-scrollbar{height:6px;}
+  nav.tabs::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
+  .tab-btn{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    color:var(--chalk-dim);
+    padding:9px 14px 9px 10px;
+    border-radius:999px;
+    font-size:13px;
+    font-family:'Inter',sans-serif;
+    font-weight:500;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:background .15s,color .15s,border-color .15s;
+  }
+  .tab-btn .num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    background:rgba(255,255,255,0.08);
+    color:var(--chalk-dim);
+    padding:2px 6px;
+    border-radius:6px;
+  }
+  .tab-btn.active{background:var(--brass);border-color:var(--brass);color:var(--ink);}
+  .tab-btn.active .num{background:rgba(13,33,54,0.25);color:var(--ink);}
+  .tab-btn:hover:not(.active){border-color:var(--brass-soft);color:var(--chalk);}
+  .tab-btn:focus-visible{outline:2px solid var(--brass);outline-offset:2px;}
+
+  .panel{display:none;}
+  .panel.active{display:block;animation:fadein .2s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .stage{display:grid;grid-template-columns:1.25fr 1fr;gap:20px;align-items:start;}
+  @media (max-width:880px){.stage{grid-template-columns:1fr;}}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+  }
+  .diagram-card svg{width:100%;height:auto;display:block;touch-action:none;}
+  .ring{fill:var(--panel-2);stroke:var(--line-soft);stroke-width:2;}
+  .stroke-dim{stroke:var(--chalk-dim);}
+  .fill-dim{fill:var(--chalk-dim);}
+  .stroke-chalk{stroke:var(--chalk);}
+  .fill-chalk{fill:var(--chalk);}
+  .stroke-brass{stroke:var(--brass);}
+  .fill-brass{fill:var(--brass);}
+  .stroke-rust{stroke:var(--rust);}
+  .fill-rust{fill:var(--rust);}
+  .stroke-teal{stroke:var(--teal);}
+  .fill-teal{fill:var(--teal);}
+  svg text{font-family:'JetBrains Mono',monospace;font-size:13px;fill:var(--chalk);user-select:none;}
+  .lbl-dim{fill:var(--chalk-dim)!important;font-size:11.5px;}
+  .lbl-big{font-size:16px;font-weight:600;}
+
+  .handle-hit{fill:transparent;cursor:grab;}
+  .handle-hit:active{cursor:grabbing;}
+  [data-handle]{touch-action:none;}
+  [data-handle]:hover .handle-dot{r:9.5;}
+  [data-handle]:focus-visible .handle-dot{stroke:var(--chalk);stroke-width:2;}
+  .handle-dot{r:8;fill:var(--brass);stroke:var(--ink);stroke-width:2;transition:r .1s;}
+  .handle-cross{stroke:var(--ink);stroke-width:1.4;}
+
+  .info-title{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:600;margin:0 0 8px;}
+  .info-text{font-size:13.5px;line-height:1.55;color:var(--chalk-dim);margin:0 0 14px;}
+  .info-text strong{color:var(--chalk);font-weight:600;}
+
+  .gauge{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 14px;
+    margin-bottom:14px;
+    box-shadow:inset 0 1px 6px rgba(0,0,0,0.25);
+  }
+  .gauge-row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;font-size:13px;}
+  .gauge-row + .gauge-row{border-top:1px dashed var(--line-soft);}
+  .gauge-row span{color:var(--chalk-dim);}
+  .gauge-row strong{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--brass);font-weight:600;}
+  .gauge-row strong.match{color:var(--good);}
+  .formula{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    text-align:center;
+    color:var(--chalk);
+    background:rgba(219,165,60,0.08);
+    border:1px dashed var(--brass-soft);
+    border-radius:8px;
+    padding:8px 6px;
+    margin-bottom:14px;
+  }
+
+  .pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+  .pill{
+    font-family:'Inter',sans-serif;
+    font-size:12.5px;
+    font-weight:500;
+    padding:6px 12px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--chalk-dim);
+    cursor:pointer;
+    transition:all .15s;
+  }
+  .pill.active{background:var(--brass);border-color:var(--brass);color:var(--ink);}
+  .pill:hover:not(.active){border-color:var(--brass-soft);color:var(--chalk);}
+  .pill:focus-visible{outline:2px solid var(--brass);outline-offset:2px;}
+
+  .reset-btn{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:'Inter',sans-serif;font-size:12.5px;font-weight:500;
+    color:var(--chalk-dim);background:transparent;border:1px solid var(--line);
+    border-radius:8px;padding:7px 12px;cursor:pointer;transition:all .15s;
+  }
+  .reset-btn:hover{border-color:var(--rust);color:var(--chalk);}
+  .reset-btn:focus-visible{outline:2px solid var(--brass);outline-offset:2px;}
+
+  /* problemas propuestos */
+  .prob-intro{font-size:13px;color:var(--chalk-dim);margin:0 0 14px;line-height:1.5;}
+  .problem{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:10px;
+    padding:12px 15px;margin-bottom:10px;font-size:13.5px;line-height:1.6;color:var(--chalk);
+    display:flex;gap:10px;
+  }
+  .problem .pn{
+    font-family:'JetBrains Mono',monospace;color:var(--brass);font-weight:600;
+    flex:0 0 auto;
+  }
+  .problem .mono{font-family:'JetBrains Mono',monospace;color:var(--chalk);}
+
+  .quiz-q{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px;}
+  .quiz-q p{margin:0 0 10px;font-size:14px;font-weight:500;}
+  .quiz-opts{display:flex;flex-direction:column;gap:7px;}
+  .quiz-opt{
+    text-align:left;font-family:'Inter',sans-serif;font-size:13.5px;
+    background:var(--panel);border:1px solid var(--line);color:var(--chalk);
+    border-radius:8px;padding:9px 12px;cursor:pointer;transition:all .15s;
+  }
+  .quiz-opt:hover{border-color:var(--brass-soft);}
+  .quiz-opt.correct{background:rgba(132,176,107,0.18);border-color:var(--good);color:var(--good);}
+  .quiz-opt.wrong{background:rgba(207,107,107,0.18);border-color:var(--bad);color:var(--bad);}
+  .quiz-opt:disabled{cursor:default;}
+  .quiz-score{
+    font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--brass);
+    text-align:center;padding:10px;background:var(--panel-2);border-radius:8px;border:1px dashed var(--brass-soft);
+  }
+
+  footer{text-align:center;color:var(--chalk-dim);font-size:12px;margin-top:36px;}
+
+  @media (prefers-reduced-motion:reduce){
+    .panel.active{animation:none;}
+    *{transition:none!important;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a href="../index.html" class="back-home">← Volver al inicio</a>
+
+  <header class="top">
+    <svg class="compass-mark" viewBox="0 0 46 46" fill="none">
+      <circle cx="23" cy="23" r="20" stroke="#dba53c" stroke-width="2"/>
+      <line x1="23" y1="4" x2="23" y2="10" stroke="#dba53c" stroke-width="2"/>
+      <line x1="23" y1="36" x2="23" y2="42" stroke="#dba53c" stroke-width="2"/>
+      <line x1="4" y1="23" x2="10" y2="23" stroke="#dba53c" stroke-width="2"/>
+      <line x1="36" y1="23" x2="42" y2="23" stroke="#dba53c" stroke-width="2"/>
+      <circle cx="23" cy="23" r="3" fill="#dba53c"/>
+      <line x1="23" y1="23" x2="34" y2="14" stroke="#f4efe3" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <div class="titles">
+      <h1>Cuadriláteros cíclicos</h1>
+      <p class="subtitle">Laboratorio de Matemática · Jóvenes Talentos · Geometría 2</p>
+    </div>
+    <span class="badge">CAP. 2 · CUADRILÁTEROS CÍCLICOS</span>
+  </header>
+
+  <details class="howto">
+    <summary>Cómo usar esta clase interactiva ▾</summary>
+    <p>Arrastrá los <strong>puntos dorados</strong> (A, B, C, D) con el mouse o el dedo: siempre se quedan sobre la circunferencia, así que el cuadrilátero es cíclico en todo momento. Los ángulos, arcos y fórmulas se actualizan en vivo. Cada sección tiene un botón <strong>Reiniciar</strong>. Navegá con las pestañas de arriba, en el orden del capítulo.</p>
+  </details>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab-btn active" data-panel="p0"><span class="num">01</span>Definición</button>
+    <button class="tab-btn" data-panel="p1"><span class="num">02</span>Ángulos opuestos</button>
+    <button class="tab-btn" data-panel="p2"><span class="num">03</span>Diagonales</button>
+    <button class="tab-btn" data-panel="p3"><span class="num">04</span>Ángulo exterior</button>
+    <button class="tab-btn" data-panel="p4"><span class="num">05</span>Ptolomeo</button>
+    <button class="tab-btn" data-panel="p5"><span class="num">06</span>Problemas</button>
+    <button class="tab-btn" data-panel="p6"><span class="num">07</span>Reto rápido</button>
+  </nav>
+
+  <!-- ===================== SECTION 0 · Definición ===================== -->
+  <section class="panel active" id="p0">
+    <div class="stage">
+      <div class="card diagram-card"><svg id="s0-svg" viewBox="0 0 560 560"></svg></div>
+      <div class="card">
+        <h2 class="info-title">¿Qué es un cuadrilátero cíclico?</h2>
+        <p class="info-text">Es un cuadrilátero que tiene sus <strong>cuatro vértices sobre una misma circunferencia</strong>. Arrastrá A, B, C y D: mientras estén sobre el círculo, <strong>ABCD siempre es cíclico</strong>. En este capítulo vas a descubrir tres propiedades y el Teorema de Ptolomeo.</p>
+        <div class="gauge">
+          <div class="gauge-row"><span>Vértices sobre la circunferencia</span><strong class="match">A · B · C · D ✓</strong></div>
+          <div class="gauge-row"><span>∠A + ∠B + ∠C + ∠D</span><strong id="s0-sum">—</strong></div>
+        </div>
+        <button class="reset-btn" id="s0-reset">↺ Reiniciar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 1 · Ángulos opuestos ===================== -->
+  <section class="panel" id="p1">
+    <div class="stage">
+      <div class="card diagram-card"><svg id="s1-svg" viewBox="0 0 560 560"></svg></div>
+      <div class="card">
+        <h2 class="info-title">Ángulos opuestos suplementarios</h2>
+        <p class="info-text">En un cuadrilátero cíclico, los <strong>ángulos opuestos suman 180°</strong>. La razón: el ángulo inscrito en A abarca el arco BCD y el de C abarca el arco DAB; entre los dos cubren toda la circunferencia (360°), y cada ángulo inscrito es la mitad de su arco.</p>
+        <div class="formula">∠A + ∠C = 180°&nbsp;&nbsp;·&nbsp;&nbsp;∠B + ∠D = 180°</div>
+        <div class="gauge">
+          <div class="gauge-row"><span>∠A (en DAB)</span><strong id="s1-a">—</strong></div>
+          <div class="gauge-row"><span>∠C (en BCD)</span><strong id="s1-c">—</strong></div>
+          <div class="gauge-row"><span>∠A + ∠C</span><strong id="s1-ac">—</strong></div>
+          <div class="gauge-row"><span>∠B + ∠D</span><strong id="s1-bd">—</strong></div>
+        </div>
+        <button class="reset-btn" id="s1-reset">↺ Reiniciar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 2 · Diagonales ===================== -->
+  <section class="panel" id="p2">
+    <div class="stage">
+      <div class="card diagram-card"><svg id="s2-svg" viewBox="0 0 560 560"></svg></div>
+      <div class="card">
+        <h2 class="info-title">Diagonales y ángulos inscritos</h2>
+        <p class="info-text">Las diagonales forman con los lados <strong>ángulos congruentes</strong>, porque son <strong>ángulos inscritos que abarcan el mismo arco</strong>. Acá, ∠x = ∠BAC y ∠y = ∠BDC abarcan los dos el <strong>arco BC</strong> (resaltado), así que son iguales.</p>
+        <div class="formula">∠x = ∠y &nbsp;&nbsp;(ambos abarcan el arco BC)</div>
+        <div class="gauge">
+          <div class="gauge-row"><span>∠x = ∠BAC (en A)</span><strong id="s2-x">—</strong></div>
+          <div class="gauge-row"><span>∠y = ∠BDC (en D)</span><strong id="s2-y">—</strong></div>
+          <div class="gauge-row"><span>Diferencia</span><strong id="s2-diff">—</strong></div>
+        </div>
+        <button class="reset-btn" id="s2-reset">↺ Reiniciar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 3 · Ángulo exterior ===================== -->
+  <section class="panel" id="p3">
+    <div class="stage">
+      <div class="card diagram-card"><svg id="s3-svg" viewBox="0 0 560 560"></svg></div>
+      <div class="card">
+        <h2 class="info-title">Ángulo exterior = interior opuesto</h2>
+        <p class="info-text">Si prolongás el lado BC más allá de C, el <strong>ángulo exterior</strong> ∠e que queda es congruente con el <strong>ángulo interior opuesto</strong> ∠i (el del vértice A). Sale de que ∠C interior y ∠A suman 180°, y ∠e también es el suplemento de ∠C.</p>
+        <div class="formula">∠e (exterior en C) = ∠i (interior en A)</div>
+        <div class="gauge">
+          <div class="gauge-row"><span>∠i (interior en A)</span><strong id="s3-i">—</strong></div>
+          <div class="gauge-row"><span>∠e (exterior en C)</span><strong id="s3-e">—</strong></div>
+          <div class="gauge-row"><span>Diferencia</span><strong id="s3-diff">—</strong></div>
+        </div>
+        <button class="reset-btn" id="s3-reset">↺ Reiniciar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 4 · Ptolomeo ===================== -->
+  <section class="panel" id="p4">
+    <div class="stage">
+      <div class="card diagram-card"><svg id="s4-svg" viewBox="0 0 560 560"></svg></div>
+      <div class="card">
+        <h2 class="info-title">Teorema de Ptolomeo</h2>
+        <p class="info-text">En todo cuadrilátero cíclico, el <strong>producto de las diagonales</strong> es igual a la <strong>suma de los productos de los lados opuestos</strong>. Arrastrá los vértices: la igualdad se mantiene siempre (las longitudes están en unidades del dibujo).</p>
+        <div class="formula">AC · BD = AB · CD + BC · AD</div>
+        <div class="gauge">
+          <div class="gauge-row"><span>Diagonales &nbsp;AC · BD</span><strong id="s4-left">—</strong></div>
+          <div class="gauge-row"><span>Lados &nbsp;AB·CD + BC·AD</span><strong id="s4-right">—</strong></div>
+          <div class="gauge-row"><span>Diferencia</span><strong id="s4-diff">—</strong></div>
+        </div>
+        <button class="reset-btn" id="s4-reset">↺ Reiniciar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 5 · Problemas ===================== -->
+  <section class="panel" id="p5">
+    <div class="card" style="max-width:760px;margin:0 auto;">
+      <h2 class="info-title">Problemas propuestos</h2>
+      <p class="prob-intro">Diez problemas para practicar. Algunos vienen con una figura que se trabaja en clase (marcados con 🖼).</p>
+      <div id="prob-list"></div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 6 · Reto rápido ===================== -->
+  <section class="panel" id="p6">
+    <div class="card" style="max-width:640px;margin:0 auto;">
+      <h2 class="info-title">Reto rápido</h2>
+      <p class="info-text">Cinco preguntas para cerrar la clase. Tocá una opción para responder.</p>
+      <div id="quiz-list"></div>
+      <div class="quiz-score" id="quiz-score">Puntaje: 0 / 5</div>
+      <div style="text-align:center;margin-top:12px;">
+        <button class="reset-btn" id="quiz-reset">↺ Reintentar</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>OMAPA · Laboratorio de Matemática — hecho para compartir en clase virtual</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const CX=280, CY=280, R=150;
+
+  /* ---------- utilidades geométricas ---------- */
+  const toRad = d => d*Math.PI/180;
+  const toDeg = r => r*180/Math.PI;
+  const mod360 = a => ((a%360)+360)%360;
+  const fmt = n => (Math.round(n*10)/10).toString().replace('.0','') + '°';
+
+  function ptOnCircle(cx,cy,r,thetaDeg){
+    const t=toRad(thetaDeg);
+    return {x:cx+r*Math.cos(t), y:cy+r*Math.sin(t)};
+  }
+  function angleOfPoint(cx,cy,x,y){ return mod360(toDeg(Math.atan2(y-cy,x-cx))); }
+  function ccwArc(a,b){ return mod360(b-a); }
+  function dist(p,q){ return Math.hypot(p.x-q.x,p.y-q.y); }
+
+  function describeArc(cx,cy,r,startDeg,endDeg){
+    const s=ptOnCircle(cx,cy,r,startDeg), e=ptOnCircle(cx,cy,r,endDeg);
+    const sweep=mod360(endDeg-startDeg);
+    const large=sweep>180?1:0;
+    return `M ${s.x.toFixed(2)} ${s.y.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${e.x.toFixed(2)} ${e.y.toFixed(2)}`;
+  }
+  // arco entre A y B (en grados) que NO contiene el punto en thetaExclude
+  function arcInfo(cx,cy,r,tA,tB,tExclude){
+    const ccw=ccwArc(tA,tB);
+    const rel=ccwArc(tA,tExclude);
+    const excludedIsOnThisArc = rel>0.001 && rel<ccw-0.001;
+    if(!excludedIsOnThisArc){
+      return {measure:ccw, path:describeArc(cx,cy,r,tA,tB)};
+    }
+    return {measure:360-ccw, path:describeArc(cx,cy,r,tB,tA)};
+  }
+  function angleAtVertex(v,p1,p2){
+    const v1={x:p1.x-v.x,y:p1.y-v.y}, v2={x:p2.x-v.x,y:p2.y-v.y};
+    const m1=Math.hypot(v1.x,v1.y), m2=Math.hypot(v2.x,v2.y);
+    if(m1<1e-6||m2<1e-6) return 0;
+    const dot=(v1.x*v2.x+v1.y*v2.y)/(m1*m2);
+    return toDeg(Math.acos(Math.max(-1,Math.min(1,dot))));
+  }
+  // pequeño arco que marca el ángulo (v, hacia p1 y p2), el menor
+  function angleMark(v,p1,p2,rad,cls){
+    const a1=mod360(toDeg(Math.atan2(p1.y-v.y,p1.x-v.x)));
+    const a2=mod360(toDeg(Math.atan2(p2.y-v.y,p2.x-v.x)));
+    let start,end;
+    if(mod360(a2-a1)<=180){ start=a1; end=a2; } else { start=a2; end=a1; }
+    const s=ptOnCircle(v.x,v.y,rad,start), e=ptOnCircle(v.x,v.y,rad,end);
+    return `<path d="M ${s.x.toFixed(1)} ${s.y.toFixed(1)} A ${rad} ${rad} 0 0 1 ${e.x.toFixed(1)} ${e.y.toFixed(1)}" fill="none" class="${cls}" stroke-width="2"/>`;
+  }
+
+  function protractorTicks(){
+    let s='';
+    for(let a=0;a<360;a+=30){
+      const long=(a%90===0);
+      const p1=ptOnCircle(CX,CY,R+4,a);
+      const p2=ptOnCircle(CX,CY,R+(long?15:9),a);
+      s+=`<line x1="${p1.x.toFixed(1)}" y1="${p1.y.toFixed(1)}" x2="${p2.x.toFixed(1)}" y2="${p2.y.toFixed(1)}" class="stroke-dim" stroke-width="${long?2:1}" opacity="${long?0.55:0.3}"/>`;
+    }
+    return s;
+  }
+  function baseSvg(){
+    return `<circle cx="${CX}" cy="${CY}" r="${R}" class="ring"/>${protractorTicks()}<circle cx="${CX}" cy="${CY}" r="3" class="fill-dim"/>`;
+  }
+  function handle(id,p,label,labelDx,labelDy){
+    labelDx = labelDx===undefined? 14 : labelDx;
+    labelDy = labelDy===undefined? -14 : labelDy;
+    return `<g data-handle="${id}" tabindex="0" aria-label="Punto ${label}">
+      <circle class="handle-hit" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="22"/>
+      <line class="handle-cross" x1="${(p.x-6).toFixed(2)}" y1="${p.y.toFixed(2)}" x2="${(p.x+6).toFixed(2)}" y2="${p.y.toFixed(2)}"/>
+      <line class="handle-cross" x1="${p.x.toFixed(2)}" y1="${(p.y-6).toFixed(2)}" x2="${p.x.toFixed(2)}" y2="${(p.y+6).toFixed(2)}"/>
+      <circle class="handle-dot" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}"/>
+      <text x="${(p.x+labelDx).toFixed(2)}" y="${(p.y+labelDy).toFixed(2)}" class="lbl-big fill-brass">${label}</text>
+    </g>`;
+  }
+  function svgPointFromEvent(svg, evt){
+    const pt = svg.createSVGPoint();
+    pt.x = evt.clientX; pt.y = evt.clientY;
+    return pt.matrixTransform(svg.getScreenCTM().inverse());
+  }
+
+  /* ---------- cuadrilátero: 4 vértices ordenados en el círculo ---------- */
+  const LBL=['A','B','C','D'];
+  function quadLayout(angs){
+    const raw=angs.map((t,i)=>({id:String(i), theta:mod360(t)}));
+    const sorted=raw.slice().sort((x,y)=>x.theta-y.theta);
+    const labelById={}, P={};
+    sorted.forEach((o,idx)=>{ labelById[o.id]=LBL[idx]; P[LBL[idx]]=ptOnCircle(CX,CY,R,o.theta); P[LBL[idx]+'t']=o.theta; });
+    return {raw,sorted,labelById,P};
+  }
+  function quadHandles(lay){
+    let s='';
+    lay.raw.forEach(o=>{ s+=handle(o.id, ptOnCircle(CX,CY,R,o.theta), lay.labelById[o.id]); });
+    return s;
+  }
+  function quadShape(P,fill){
+    return `<polygon points="${P.A.x.toFixed(1)},${P.A.y.toFixed(1)} ${P.B.x.toFixed(1)},${P.B.y.toFixed(1)} ${P.C.x.toFixed(1)},${P.C.y.toFixed(1)} ${P.D.x.toFixed(1)},${P.D.y.toFixed(1)}" fill="${fill||'rgba(219,165,60,0.07)'}" class="stroke-brass" stroke-width="2.5"/>`;
+  }
+  function segLine(p,q,cls,w,dash){
+    return `<line x1="${p.x.toFixed(1)}" y1="${p.y.toFixed(1)}" x2="${q.x.toFixed(1)}" y2="${q.y.toFixed(1)}" class="${cls}" stroke-width="${w||2}"${dash?` stroke-dasharray="${dash}"`:''}/>`;
+  }
+
+  /* generic drag wiring */
+  function wireDrag(svg, onDown, onMove){
+    let active=null;
+    svg.addEventListener('pointerdown', e=>{
+      const g=e.target.closest('[data-handle]');
+      if(!g) return;
+      e.preventDefault();
+      active=g.dataset.handle;
+      onDown && onDown(active);
+    });
+    document.addEventListener('pointermove', e=>{
+      if(!active) return;
+      const p=svgPointFromEvent(svg,e);
+      onMove(active,p);
+    });
+    document.addEventListener('pointerup', ()=>{ active=null; });
+    document.addEventListener('pointercancel', ()=>{ active=null; });
+    svg.addEventListener('keydown', e=>{
+      const g=e.target.closest('[data-handle]');
+      if(!g) return;
+      const step = (e.key==='ArrowLeft'||e.key==='ArrowDown') ? -2 : (e.key==='ArrowRight'||e.key==='ArrowUp') ? 2 : 0;
+      if(step===0) return;
+      e.preventDefault();
+      onMove(g.dataset.handle, null, step);
+    });
+  }
+  // helper para actualizar el ángulo de un vértice del cuadrilátero
+  function quadDrag(st, id, p, step){
+    const i=Number(id);
+    st.a[i] = p? angleOfPoint(CX,CY,p.x,p.y) : mod360(st.a[i]+step);
+  }
+
+  const BASE=[40,125,215,310];
+
+  /* =========================================================
+     SECTION 0 — Definición
+  ========================================================= */
+  (function(){
+    const svg=document.getElementById('s0-svg');
+    let st={a:BASE.slice()};
+    function render(){
+      const lay=quadLayout(st.a), P=lay.P;
+      let s=baseSvg();
+      s+=quadShape(P,'rgba(219,165,60,0.10)');
+      s+=quadHandles(lay);
+      svg.innerHTML=s;
+      const sum=angleAtVertex(P.A,P.B,P.D)+angleAtVertex(P.B,P.A,P.C)+angleAtVertex(P.C,P.B,P.D)+angleAtVertex(P.D,P.A,P.C);
+      const el=document.getElementById('s0-sum');
+      el.textContent=fmt(sum);
+      el.classList.toggle('match', Math.abs(sum-360)<0.6);
+    }
+    wireDrag(svg,null,(id,p,step)=>{ quadDrag(st,id,p,step); render(); });
+    document.getElementById('s0-reset').addEventListener('click',()=>{ st={a:BASE.slice()}; render(); });
+    render();
+  })();
+
+  /* =========================================================
+     SECTION 1 — Ángulos opuestos
+  ========================================================= */
+  (function(){
+    const svg=document.getElementById('s1-svg');
+    let st={a:BASE.slice()};
+    function render(){
+      const lay=quadLayout(st.a), P=lay.P;
+      let s=baseSvg();
+      // arcos: el que "ve" A (BCD, no contiene A) en óxido; el que ve C (DAB, no contiene C) en verde
+      const arcA=arcInfo(CX,CY,R,P.Bt,P.Dt,P.At); // B->D sin A  (pasa por C)
+      const arcC=arcInfo(CX,CY,R,P.Bt,P.Dt,P.Ct); // B->D sin C  (pasa por A)
+      s+=`<path d="${arcA.path}" fill="none" class="stroke-rust" stroke-width="6" opacity="0.5"/>`;
+      s+=`<path d="${arcC.path}" fill="none" class="stroke-teal" stroke-width="6" opacity="0.5"/>`;
+      s+=quadShape(P);
+      s+=angleMark(P.A,P.B,P.D,24,'stroke-rust');
+      s+=angleMark(P.C,P.B,P.D,24,'stroke-teal');
+      s+=quadHandles(lay);
+      svg.innerHTML=s;
+
+      const aA=angleAtVertex(P.A,P.B,P.D), aC=angleAtVertex(P.C,P.B,P.D);
+      const aB=angleAtVertex(P.B,P.A,P.C), aD=angleAtVertex(P.D,P.A,P.C);
+      document.getElementById('s1-a').textContent=fmt(aA);
+      document.getElementById('s1-c').textContent=fmt(aC);
+      const ac=document.getElementById('s1-ac'); ac.textContent=fmt(aA+aC); ac.classList.toggle('match',Math.abs(aA+aC-180)<0.6);
+      const bd=document.getElementById('s1-bd'); bd.textContent=fmt(aB+aD); bd.classList.toggle('match',Math.abs(aB+aD-180)<0.6);
+    }
+    wireDrag(svg,null,(id,p,step)=>{ quadDrag(st,id,p,step); render(); });
+    document.getElementById('s1-reset').addEventListener('click',()=>{ st={a:BASE.slice()}; render(); });
+    render();
+  })();
+
+  /* =========================================================
+     SECTION 2 — Diagonales (∠x = ∠y)
+  ========================================================= */
+  (function(){
+    const svg=document.getElementById('s2-svg');
+    let st={a:BASE.slice()};
+    function render(){
+      const lay=quadLayout(st.a), P=lay.P;
+      let s=baseSvg();
+      // arco BC (no contiene A) resaltado
+      const arcBC=arcInfo(CX,CY,R,P.Bt,P.Ct,P.At);
+      s+=`<path d="${arcBC.path}" fill="none" class="stroke-rust" stroke-width="6" opacity="0.55"/>`;
+      s+=quadShape(P,'rgba(219,165,60,0.05)');
+      // diagonales
+      s+=segLine(P.A,P.C,'stroke-teal',2,'5 4');
+      s+=segLine(P.B,P.D,'stroke-teal',2,'5 4');
+      // ángulos ∠BAC (en A) y ∠BDC (en D)
+      s+=angleMark(P.A,P.B,P.C,22,'stroke-brass');
+      s+=angleMark(P.D,P.B,P.C,22,'stroke-brass');
+      s+=`<text x="${(P.A.x+(P.B.x+P.C.x)/2)/2-12}" y="${(P.A.y+(P.B.y+P.C.y)/2)/2}" class="fill-brass">x</text>`;
+      s+=`<text x="${(P.D.x+(P.B.x+P.C.x)/2)/2}" y="${(P.D.y+(P.B.y+P.C.y)/2)/2+4}" class="fill-brass">y</text>`;
+      s+=quadHandles(lay);
+      svg.innerHTML=s;
+
+      const x=angleAtVertex(P.A,P.B,P.C), y=angleAtVertex(P.D,P.B,P.C);
+      document.getElementById('s2-x').textContent=fmt(x);
+      document.getElementById('s2-y').textContent=fmt(y);
+      const df=document.getElementById('s2-diff'); df.textContent=fmt(Math.abs(x-y)); df.classList.toggle('match',Math.abs(x-y)<0.6);
+    }
+    wireDrag(svg,null,(id,p,step)=>{ quadDrag(st,id,p,step); render(); });
+    document.getElementById('s2-reset').addEventListener('click',()=>{ st={a:BASE.slice()}; render(); });
+    render();
+  })();
+
+  /* =========================================================
+     SECTION 3 — Ángulo exterior (∠e = ∠i)
+  ========================================================= */
+  (function(){
+    const svg=document.getElementById('s3-svg');
+    let st={a:BASE.slice()};
+    function render(){
+      const lay=quadLayout(st.a), P=lay.P;
+      // prolongación de BC más allá de C
+      let dx=P.C.x-P.B.x, dy=P.C.y-P.B.y, len=Math.hypot(dx,dy)||1;
+      const E={x:P.C.x+dx/len*80, y:P.C.y+dy/len*80};
+
+      let s=baseSvg();
+      s+=quadShape(P,'rgba(219,165,60,0.05)');
+      s+=segLine(P.C,E,'stroke-rust',2,'5 4');
+      s+=`<circle cx="${E.x.toFixed(1)}" cy="${E.y.toFixed(1)}" r="3.5" class="fill-rust"/><text x="${(E.x+6).toFixed(1)}" y="${(E.y+4).toFixed(1)}" class="fill-rust">E</text>`;
+      // ángulo interior en A (∠i) y exterior en C (∠e)
+      s+=angleMark(P.A,P.B,P.D,22,'stroke-teal');
+      s+=angleMark(P.C,E,P.D,20,'stroke-rust');
+      s+=`<text x="${(P.A.x + (P.B.x+P.D.x)/2)/2 - 6}" y="${(P.A.y+(P.B.y+P.D.y)/2)/2+4}" class="fill-teal">i</text>`;
+      s+=`<text x="${(P.C.x+E.x)/2 + 4}" y="${(P.C.y+E.y)/2 - 6}" class="fill-rust">e</text>`;
+      s+=quadHandles(lay);
+      svg.innerHTML=s;
+
+      const i=angleAtVertex(P.A,P.B,P.D), e=angleAtVertex(P.C,E,P.D);
+      document.getElementById('s3-i').textContent=fmt(i);
+      document.getElementById('s3-e').textContent=fmt(e);
+      const df=document.getElementById('s3-diff'); df.textContent=fmt(Math.abs(i-e)); df.classList.toggle('match',Math.abs(i-e)<0.6);
+    }
+    wireDrag(svg,null,(id,p,step)=>{ quadDrag(st,id,p,step); render(); });
+    document.getElementById('s3-reset').addEventListener('click',()=>{ st={a:BASE.slice()}; render(); });
+    render();
+  })();
+
+  /* =========================================================
+     SECTION 4 — Teorema de Ptolomeo
+  ========================================================= */
+  (function(){
+    const svg=document.getElementById('s4-svg');
+    let st={a:BASE.slice()};
+    function render(){
+      const lay=quadLayout(st.a), P=lay.P;
+      let s=baseSvg();
+      s+=quadShape(P,'rgba(219,165,60,0.05)');
+      s+=segLine(P.A,P.C,'stroke-teal',2.5);
+      s+=segLine(P.B,P.D,'stroke-teal',2.5);
+      s+=quadHandles(lay);
+      svg.innerHTML=s;
+
+      const AC=dist(P.A,P.C), BD=dist(P.B,P.D);
+      const AB=dist(P.A,P.B), BC=dist(P.B,P.C), CD=dist(P.C,P.D), AD=dist(P.A,P.D);
+      const left=AC*BD, right=AB*CD+BC*AD;
+      document.getElementById('s4-left').textContent=Math.round(left).toLocaleString('es');
+      document.getElementById('s4-right').textContent=Math.round(right).toLocaleString('es');
+      const df=document.getElementById('s4-diff');
+      df.textContent=Math.round(Math.abs(left-right)).toLocaleString('es');
+      df.classList.toggle('match', Math.abs(left-right) < Math.max(1,0.002*right));
+    }
+    wireDrag(svg,null,(id,p,step)=>{ quadDrag(st,id,p,step); render(); });
+    document.getElementById('s4-reset').addEventListener('click',()=>{ st={a:BASE.slice()}; render(); });
+    render();
+  })();
+
+  /* =========================================================
+     SECTION 5 — Problemas propuestos
+  ========================================================= */
+  (function(){
+    const PROBS=[
+      'Sobre la hipotenusa <span class="mono">AC</span> de un triángulo rectángulo se dibuja exteriormente el cuadrado <span class="mono">ACEF</span>, de centro <span class="mono">O</span>. Hallar la medida del ángulo <span class="mono">∠OBC</span>.',
+      'Demostrar que en todo triángulo las tres alturas se cortan en un mismo punto.',
+      '🖼 <span class="mono">M</span> es punto medio de <span class="mono">AB</span>. <span class="mono">DS</span> y <span class="mono">CL</span> son cuerdas cualesquiera que pasan por <span class="mono">M</span>. Demostrar que <span class="mono">EM = MF</span>.',
+      'En un triángulo rectángulo <span class="mono">ABC</span> recto en <span class="mono">B</span>, se traza la altura <span class="mono">BH</span>. Si <span class="mono">r, r₁, r₂</span> son los inradios de los triángulos <span class="mono">ABC</span>, <span class="mono">AHB</span> y <span class="mono">BHC</span> respectivamente, demostrar que <span class="mono">BH = r + r₁ + r₂</span>.',
+      '🖼 El cuadrilátero <span class="mono">ABCD</span> es circunscripto y <span class="mono">AC ⊥ BD</span>. Si <span class="mono">a, b, c, d</span> son los inradios de los triángulos <span class="mono">APB, BPC, CPD, APD</span> respectivamente, demostrar que <span class="mono">a + c = b + d</span>.',
+      '🖼 <span class="mono">O</span> y <span class="mono">B</span> son centros y <span class="mono">BC = 5</span>. Hallar <span class="mono">EF</span>.',
+      '🖼 <span class="mono">A, B, C</span> son puntos de tangencia. Los radios miden <span class="mono">12</span> y <span class="mono">24</span>, y <span class="mono">O</span> es el centro de la circunferencia. Hallar <span class="mono">EF</span>.',
+      'El trapecio <span class="mono">ABCD</span> está inscripto en una circunferencia (el centro es interior al cuadrilátero). Hallar la longitud del radio si <span class="mono">BC ∥ AD</span>, <span class="mono">BC = 40</span>, <span class="mono">AD = 48</span> y la altura del trapecio mide <span class="mono">22</span>.',
+      'Sea <span class="mono">AB</span> el diámetro de una semicircunferencia. Se marca un punto <span class="mono">M</span> sobre la semicircunferencia y un punto <span class="mono">K</span> sobre <span class="mono">AB</span>. Una circunferencia con centro <span class="mono">P</span> pasa por <span class="mono">A, M, K</span> y otra con centro <span class="mono">Q</span> pasa por <span class="mono">M, K, B</span>. Demostrar que <span class="mono">M, K, P, Q</span> son concíclicos.',
+      'Sea <span class="mono">ABC</span> un triángulo con <span class="mono">AB &lt; AC</span> y sea <span class="mono">I</span> su incentro. La prolongación de <span class="mono">AI</span> interseca a la circunferencia circunscrita al triángulo <span class="mono">BIC</span> en <span class="mono">P</span>. Sea <span class="mono">Q</span> un punto del lado <span class="mono">AC</span> tal que <span class="mono">AB = AQ</span>, y <span class="mono">R</span> un punto en <span class="mono">AB</span>, con <span class="mono">B</span> entre <span class="mono">A</span> y <span class="mono">R</span>, tal que <span class="mono">AR = AC</span>. Probar que el cuadrilátero <span class="mono">IQPR</span> es cíclico.'
+    ];
+    const list=document.getElementById('prob-list');
+    list.innerHTML=PROBS.map((t,i)=>`<div class="problem"><span class="pn">${i+1})</span><span>${t}</span></div>`).join('');
+  })();
+
+  /* =========================================================
+     SECTION 6 — Reto rápido
+  ========================================================= */
+  (function(){
+    const QUESTIONS=[
+      {q:'¿Qué es un cuadrilátero cíclico?',
+       opts:['Uno que tiene todos sus lados iguales','Uno con sus cuatro vértices sobre una misma circunferencia','Uno con las diagonales perpendiculares','Uno inscrito en un cuadrado'], correct:1},
+      {q:'En un cuadrilátero cíclico, dos ángulos opuestos…',
+       opts:['son siempre iguales','suman 90°','suman 180°','suman 360°'], correct:2},
+      {q:'El Teorema de Ptolomeo afirma que, en un cuadrilátero cíclico ABCD:',
+       opts:['AC + BD = AB + CD','AC · BD = AB · CD + BC · AD','AC · BD = AB · BC + CD · AD','AC² + BD² = AB² + CD²'], correct:1},
+      {q:'Un ángulo exterior de un cuadrilátero cíclico es congruente con…',
+       opts:['el ángulo interior adyacente','el ángulo interior opuesto','la mitad de una diagonal','un ángulo recto'], correct:1},
+      {q:'Dos ángulos inscritos que abarcan el mismo arco son…',
+       opts:['suplementarios','congruentes (iguales)','complementarios','siempre rectos'], correct:1}
+    ];
+    const list=document.getElementById('quiz-list');
+    const scoreEl=document.getElementById('quiz-score');
+    let answered=new Array(QUESTIONS.length).fill(false);
+    let score=0;
+
+    function build(){
+      list.innerHTML='';
+      QUESTIONS.forEach((item,qi)=>{
+        const box=document.createElement('div'); box.className='quiz-q';
+        const p=document.createElement('p'); p.textContent=(qi+1)+'. '+item.q;
+        box.appendChild(p);
+        const optsDiv=document.createElement('div'); optsDiv.className='quiz-opts';
+        item.opts.forEach((opt,oi)=>{
+          const btn=document.createElement('button');
+          btn.className='quiz-opt'; btn.textContent=opt;
+          btn.addEventListener('click', ()=>{
+            if(answered[qi]) return;
+            answered[qi]=true;
+            const allBtns=optsDiv.querySelectorAll('.quiz-opt');
+            allBtns.forEach(b=>b.disabled=true);
+            if(oi===item.correct){ btn.classList.add('correct'); score++; }
+            else { btn.classList.add('wrong'); allBtns[item.correct].classList.add('correct'); }
+            scoreEl.textContent='Puntaje: '+score+' / '+QUESTIONS.length;
+          });
+          optsDiv.appendChild(btn);
+        });
+        box.appendChild(optsDiv);
+        list.appendChild(box);
+      });
+    }
+    document.getElementById('quiz-reset').addEventListener('click', ()=>{
+      answered=new Array(QUESTIONS.length).fill(false); score=0;
+      scoreEl.textContent='Puntaje: 0 / '+QUESTIONS.length;
+      build();
+    });
+    build();
+  })();
+
+  /* =========================================================
+     NAV
+  ========================================================= */
+  document.getElementById('tabs').addEventListener('click', e=>{
+    const btn=e.target.closest('.tab-btn'); if(!btn) return;
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b===btn));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id===btn.dataset.panel));
+  });
+
+})();
+</script>
+</body>
+</html>
