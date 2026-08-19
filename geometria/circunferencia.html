@@ -238,6 +238,13 @@
     text-align:center;padding:10px;background:var(--panel-2);border-radius:8px;border:1px dashed var(--brass-soft);
   }
 
+  .subhead{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--brass);margin:18px 0 10px;}
+  .subhead:first-child{margin-top:0;}
+  .prob-intro{font-size:13px;color:var(--chalk-dim);margin:0 0 14px;line-height:1.5;}
+  .problem{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:12px 15px;margin-bottom:10px;font-size:13.5px;line-height:1.6;color:var(--chalk);display:flex;gap:10px;}
+  .problem .pn{font-family:'JetBrains Mono',monospace;color:var(--brass);font-weight:600;flex:0 0 auto;}
+  .problem .mono{font-family:'JetBrains Mono',monospace;color:var(--chalk);}
+
   footer{text-align:center;color:var(--chalk-dim);font-size:12px;margin-top:36px;}
 
   @media (prefers-reduced-motion:reduce){
@@ -281,7 +288,9 @@
     <button class="tab-btn" data-panel="p4"><span class="num">05</span>Interior</button>
     <button class="tab-btn" data-panel="p5"><span class="num">06</span>Exterior</button>
     <button class="tab-btn" data-panel="p6"><span class="num">07</span>Arco capaz</button>
-    <button class="tab-btn" data-panel="p7"><span class="num">08</span>Reto rápido</button>
+    <button class="tab-btn" data-panel="p8"><span class="num">08</span>Propiedades básicas</button>
+    <button class="tab-btn" data-panel="p9"><span class="num">09</span>Problemas</button>
+    <button class="tab-btn" data-panel="p7"><span class="num">10</span>Reto rápido</button>
   </nav>
 
   <!-- ===================== SECTION 0 ===================== -->
@@ -421,6 +430,28 @@
         </div>
         <button class="reset-btn" id="s6-reset">↺ Reiniciar</button>
       </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 8 · Propiedades básicas ===================== -->
+  <section class="panel" id="p8">
+    <div class="card" style="max-width:760px;margin:0 auto;">
+      <h2 class="info-title">Propiedades básicas de la circunferencia</h2>
+
+      <div class="subhead">Propiedad importante</div>
+      <div class="problem"><span class="pn">•</span><span>Por tres puntos no colineales pasa una <strong>única</strong> circunferencia. Su centro es el punto donde concurren las <strong>mediatrices</strong> de los lados del triángulo que forman esos puntos (el circuncentro), que equidista de los tres vértices.</span></div>
+
+      <div class="subhead">Propiedades</div>
+      <div id="props-list"></div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 9 · Problemas ===================== -->
+  <section class="panel" id="p9">
+    <div class="card" style="max-width:760px;margin:0 auto;">
+      <h2 class="info-title">Problemas propuestos</h2>
+      <p class="prob-intro">Diez problemas para practicar. Algunos vienen con una figura que se trabaja en clase (marcados con 🖼).</p>
+      <div id="prob-list"></div>
     </div>
   </section>
 
@@ -1186,6 +1217,45 @@
       build();
     });
     build();
+  })();
+
+  /* =========================================================
+     SECTION 8 — Propiedades básicas (lista)
+  ========================================================= */
+  (function(){
+    const PROPS=[
+      'Todo radio es <strong>perpendicular</strong> a cualquier tangente en su punto de tangencia.',
+      'En una misma circunferencia (o en circunferencias congruentes), a <strong>arcos congruentes</strong> corresponden <strong>cuerdas congruentes</strong>, y recíprocamente.',
+      'Las <strong>cuerdas paralelas</strong> interceptan arcos congruentes.',
+      'Los segmentos de tangente trazados a una circunferencia desde un <strong>mismo punto exterior</strong> son congruentes.',
+      'Desde un punto exterior, el segmento que une ese punto con el <strong>centro</strong> es <strong>bisectriz</strong> del ángulo formado por las dos tangentes.',
+      'Todo <strong>diámetro perpendicular a una cuerda</strong> biseca a la cuerda y a los arcos que ella determina.',
+      'Las cuerdas <strong>equidistantes del centro</strong> son congruentes.',
+      'De dos cuerdas desiguales, es <strong>mayor</strong> la que está <strong>más cerca</strong> del centro.',
+      'Dos circunferencias congruentes y secantes determinan sobre ellas dos pares de arcos congruentes.'
+    ];
+    document.getElementById('props-list').innerHTML =
+      PROPS.map((t,i)=>`<div class="problem"><span class="pn">${i+1}.</span><span>${t}</span></div>`).join('');
+  })();
+
+  /* =========================================================
+     SECTION 9 — Problemas propuestos (lista)
+  ========================================================= */
+  (function(){
+    const PROBS=[
+      '🖼 En la figura, <span class="mono">AE</span> es diámetro y <span class="mono">N</span> es punto de tangencia. Hallar el valor de <span class="mono">x</span>.',
+      '🖼 Los círculos con centros <span class="mono">A</span> y <span class="mono">B</span> tienen radios <span class="mono">3</span> y <span class="mono">8</span>. Una tangente interna común corta a los círculos en <span class="mono">C</span> y <span class="mono">D</span>. Las rectas <span class="mono">AB</span> y <span class="mono">CD</span> se cortan en <span class="mono">E</span>, con <span class="mono">AE = 5</span>. ¿Cuánto vale <span class="mono">CD</span>?',
+      'Desde un punto <span class="mono">P</span> exterior a una circunferencia se trazan las tangentes <span class="mono">PC</span> y <span class="mono">PD</span>, que forman un <strong>ángulo recto</strong>. Se traza la secante <span class="mono">PAB</span> de modo que el arco <span class="mono">BC</span> es el doble del arco <span class="mono">AC</span>. Hallar la medida de <span class="mono">∠BPC</span>.',
+      '🖼 En la figura, <span class="mono">∠APD + ∠BPC = 216°</span>. Hallar <span class="mono">∠AZC</span>, donde <span class="mono">Z</span> es la intersección de las prolongaciones de <span class="mono">AB</span> y <span class="mono">CD</span>.',
+      '🖼 En la figura, <span class="mono">AQ = BC</span> (con <span class="mono">∠A = 30°</span> y <span class="mono">∠C = 24°</span>). Hallar el valor de <span class="mono">x</span>.',
+      'Probar que, en todo triángulo, el punto de intersección entre la <strong>mediatriz de un lado</strong> y la <strong>bisectriz del ángulo opuesto</strong> cae sobre la circunferencia circunscripta.',
+      'En un triángulo <span class="mono">ABC</span>, sea <span class="mono">I</span> el incentro y <span class="mono">E</span> el excentro relativo a <span class="mono">BC</span>. La recta <span class="mono">IE</span> corta a la circunferencia circunscripta en <span class="mono">M</span>. Demostrar que <span class="mono">IM = EM</span>.',
+      'Los puntos <span class="mono">A</span> y <span class="mono">B</span> están en un círculo de centro <span class="mono">O</span> con <span class="mono">∠AOB = 60°</span>. Un segundo círculo es tangente internamente al primero y tangente a <span class="mono">OA</span> y a <span class="mono">OB</span>. ¿Cuál es la razón entre el área del círculo pequeño y la del grande?',
+      'El centro <span class="mono">O</span> de la circunferencia <span class="mono">C₁</span> está sobre otra circunferencia <span class="mono">C₂</span>. Ambas se cortan en <span class="mono">X</span> e <span class="mono">Y</span>. El punto <span class="mono">Z</span>, exterior a <span class="mono">C₁</span>, está sobre <span class="mono">C₂</span> y cumple <span class="mono">OZ = 11</span>, <span class="mono">XZ = 13</span>, <span class="mono">YZ = 7</span>. Hallar el radio de <span class="mono">C₁</span>.',
+      'En el triángulo <span class="mono">ABC</span>, <span class="mono">I</span> es el incentro y la bisectriz de <span class="mono">∠ACB</span> corta a <span class="mono">AB</span> en <span class="mono">L</span>. La recta <span class="mono">CL</span> corta a la circunferencia circunscripta en <span class="mono">C</span> y <span class="mono">D</span>. Si <span class="mono">LI = 2</span> y <span class="mono">LD = 3</span>, entonces <span class="mono">IC = m/n</span> con <span class="mono">m, n</span> enteros positivos coprimos. Hallar <span class="mono">m + n</span>.'
+    ];
+    document.getElementById('prob-list').innerHTML =
+      PROBS.map((t,i)=>`<div class="problem"><span class="pn">${i+1})</span><span>${t}</span></div>`).join('');
   })();
 
   /* =========================================================
